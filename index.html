@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>M.ACADEMY • Online School — Beyond Learning. Beyond Limits.</title>
+    <meta
+      name="description"
+      content="M.ACADEMY — zamonaviy onlayn ta’lim ekotizimi: xorijiy tillar, aniq va ijtimoiy fanlar bo‘yicha 16 ta yo‘nalish."
+    />
+    <meta name="theme-color" content="#05070f" />
+    <meta property="og:title" content="M.ACADEMY • Online School" />
+    <meta property="og:description" content="Beyond Learning. Beyond Limits." />
+    <meta property="og:image" content="/img/icon-512.png" />
+    <link rel="icon" type="image/png" href="/img/favicon.png" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500;1,600&family=Manrope:wght@300..800&family=Unbounded:wght@300..800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" as="image" href="/img/logo-mark.webp" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+
+  <body class="is-loading">
+    <!-- ============ PRELOADER ============ -->
+    <div class="preloader" id="preloader" aria-hidden="true">
+      <div class="preloader__inner">
+        <div class="preloader__mark">
+          <img src="/img/logo-mark.webp" alt="" width="543" height="531" />
+          <span class="preloader__shine"></span>
+        </div>
+        <div class="preloader__bar"><span id="preloader-bar"></span></div>
+        <div class="preloader__meta">
+          <span>M.ACADEMY</span>
+          <span><b id="preloader-num">0</b>%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grain" aria-hidden="true"></div>
+    <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress"></span></div>
+    <div class="cursor" id="cursor" aria-hidden="true"><i></i><b></b></div>
+
+    <!-- ============ NAV ============ -->
+    <header class="nav" id="nav">
+      <div class="nav__inner">
+        <a class="brand" href="#top" aria-label="M.ACADEMY">
+          <img src="/img/logo-mark.webp" alt="" width="543" height="531" />
+          <span class="brand__text"><b>M.ACADEMY</b><small>ONLINE SCHOOL</small></span>
+        </a>
+
+        <nav class="nav__links" aria-label="Primary">
+          <a href="#about" data-i18n="nav.about">Akademiya</a>
+          <a href="#courses" data-i18n="nav.courses">Kurslar</a>
+          <a href="#mentors" data-i18n="nav.mentors">Ustozlar</a>
+          <a href="#results" data-i18n="nav.results">Natijalar</a>
+          <a href="#nigina">NIGINA</a>
+          <a href="#contact" data-i18n="nav.contact">Aloqa</a>
+        </nav>
+
+        <div class="nav__side">
+          <div class="lang" role="group" aria-label="Language">
+            <button type="button" data-lang="uz" class="is-active">UZ</button>
+            <button type="button" data-lang="ru">RU</button>
+            <button type="button" data-lang="en">EN</button>
+          </div>
+          <button type="button" class="btn btn--gold btn--sm nav__cta" data-open-form data-i18n="cta.signup">
+            Ro‘yxatdan o‘tish
+          </button>
+          <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+            <span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="menu" id="menu" aria-hidden="true">
+      <nav class="menu__links">
+        <a href="#about"><i>01</i><span data-i18n="nav.about">Akademiya</span></a>
+        <a href="#courses"><i>02</i><span data-i18n="nav.courses">Kurslar</span></a>
+        <a href="#mentors"><i>03</i><span data-i18n="nav.mentors">Ustozlar</span></a>
+        <a href="#results"><i>04</i><span data-i18n="nav.results">Natijalar</span></a>
+        <a href="#nigina"><i>05</i><span>NIGINA</span></a>
+        <a href="#contact"><i>06</i><span data-i18n="nav.contact">Aloqa</span></a>
+      </nav>
+      <div class="menu__foot">
+        <div class="lang" role="group" aria-label="Language">
+          <button type="button" data-lang="uz" class="is-active">UZ</button>
+          <button type="button" data-lang="ru">RU</button>
+          <button type="button" data-lang="en">EN</button>
+        </div>
+        <button type="button" class="btn btn--gold" data-open-form data-i18n="cta.signup">Ro‘yxatdan o‘tish</button>
+      </div>
+    </div>
+
+    <main id="top">
+      <!-- ============ HERO ============ -->
+      <section class="hero" id="hero">
+        <div class="hero__bg" aria-hidden="true">
+          <span class="hero__beam hero__beam--a"></span>
+          <span class="hero__beam hero__beam--b"></span>
+          <span class="hero__glow"></span>
+        </div>
+        <canvas class="hero__canvas" id="hero-canvas" aria-hidden="true"></canvas>
+        <div class="hero__shade" aria-hidden="true"></div>
+
+        <div class="container hero__content">
+          <p class="eyebrow hero__eyebrow"><span class="eyebrow__line"></span>M.ACADEMY • ONLINE SCHOOL</p>
+          <h1 class="hero__title" aria-label="Beyond Learning. Beyond Limits.">
+            <span class="hero__line"><span>BEYOND LEARNING.</span></span>
+            <span class="hero__line hero__line--gold"><span>BEYOND LIMITS.</span></span>
+          </h1>
+          <p class="hero__sub" data-i18n="hero.sub">Kelajagingizni yangi bilimlar bilan yarating.</p>
+          <div class="hero__cta">
+            <a class="btn btn--gold magnetic" href="#courses">
+              <span data-i18n="hero.cta1">Kurslarni ko‘rish</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </a>
+            <a class="btn btn--ghost magnetic" href="#about" data-i18n="hero.cta2">Biz bilan o‘rganing</a>
+          </div>
+          <ul class="hero__tags">
+            <li data-i18n="hero.tag1">Tillar</li>
+            <li data-i18n="hero.tag2">Aniq fanlar</li>
+            <li data-i18n="hero.tag3">Ijtimoiy fanlar</li>
+          </ul>
+        </div>
+
+        <a class="hero__scroll" href="#about">
+          <span data-i18n="hero.scroll">Pastga suring</span>
+          <i></i>
+        </a>
+      </section>
+
+      <!-- ============ MARQUEE ============ -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track" id="marquee"></div>
+      </div>
+
+      <!-- ============ ABOUT ============ -->
+      <section class="section about" id="about">
+        <div class="container">
+          <div class="about__grid">
+            <div class="about__copy">
+              <p class="eyebrow" data-reveal><span class="eyebrow__line"></span><span data-i18n="about.eyebrow">Akademiya</span></p>
+              <h2 class="h2" data-reveal data-i18n="about.title">Zamonaviy onlayn ta’lim <em>ekotizimi</em></h2>
+              <p class="lead" data-reveal data-i18n="about.text">
+                M.ACADEMY — bilim, texnologiya va ilhom bir joyda uchrashadigan raqamli maktab. Biz har bir o‘quvchiga
+                o‘z sur’atida, istalgan joydan, eng yaxshi ustozlar bilan o‘rganish imkonini yaratamiz.
+              </p>
+              <div class="about__sign" data-reveal>
+                <img src="/img/logo-mark.webp" alt="" width="543" height="531" loading="lazy" />
+                <span>BEYOND LEARNING.<br />BEYOND LIMITS.</span>
+              </div>
+            </div>
+
+            <div class="about__stage" data-reveal>
+              <span class="about__halo"></span>
+              <canvas id="emblem-canvas" aria-hidden="true"></canvas>
+              <img class="about__fallback" src="/img/logo-mark.webp" alt="M.ACADEMY" width="543" height="531" loading="lazy" />
+            </div>
+          </div>
+
+          <div class="features" data-stagger>
+            <article class="card feature tilt" data-reveal>
+              <span class="card__num">01</span>
+              <div class="icon">
+                <svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5" /><path d="m3 17 9 5 9-5" /></svg>
+              </div>
+              <h3 data-i18n="about.f1.title">Yagona ekotizim</h3>
+              <p data-i18n="about.f1.text">Darslar, materiallar va natijalar — barchasi bitta qulay platformada jamlanadi.</p>
+            </article>
+            <article class="card feature tilt" data-reveal>
+              <span class="card__num">02</span>
+              <div class="icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" /></svg>
+              </div>
+              <h3 data-i18n="about.f2.title">Shaxsiy yo‘l</h3>
+              <p data-i18n="about.f2.text">Har bir o‘quvchi uchun darajasi va maqsadiga mos o‘quv yo‘nalishi.</p>
+            </article>
+            <article class="card feature tilt" data-reveal>
+              <span class="card__num">03</span>
+              <div class="icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /><path d="m12 7.5 1.3 3.2 3.2 1.3-3.2 1.3-1.3 3.2-1.3-3.2L7.5 12l3.2-1.3L12 7.5Z" /></svg>
+              </div>
+              <h3 data-i18n="about.f3.title">Kelajak texnologiyalari</h3>
+              <p data-i18n="about.f3.text">Sun’iy intellekt va interaktiv vositalar bilan boyitilgan ta’lim tajribasi.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ COURSES ============ -->
+      <section class="section courses" id="courses">
+        <div class="container">
+          <header class="section__head">
+            <div>
+              <p class="eyebrow" data-reveal><span class="eyebrow__line"></span><span data-i18n="courses.eyebrow">Kurslar</span></p>
+              <h2 class="h2" data-reveal data-i18n="courses.title">Bilim olamiga <em>yo‘l oching</em></h2>
+              <p class="lead" data-reveal data-i18n="courses.sub">
+                Xorijiy tillardan tortib aniq va ijtimoiy fanlargacha — 16 ta yo‘nalish.
+              </p>
+            </div>
+            <div class="filters" id="filters" data-reveal role="tablist">
+              <button type="button" class="is-active" data-filter="all" data-i18n="courses.all">Barchasi</button>
+              <button type="button" data-filter="lang" data-i18n="courses.lang">Tillar</button>
+              <button type="button" data-filter="exact" data-i18n="courses.exact">Aniq fanlar</button>
+              <button type="button" data-filter="social" data-i18n="courses.social">Ijtimoiy fanlar</button>
+            </div>
+          </header>
+          <div class="courses__grid" id="courses-grid"></div>
+        </div>
+      </section>
+
+      <!-- ============ WHY ============ -->
+      <section class="section why" id="why">
+        <div class="container">
+          <header class="section__head section__head--center">
+            <p class="eyebrow" data-reveal><span class="eyebrow__line"></span><span data-i18n="why.eyebrow">Nega M.ACADEMY</span><span class="eyebrow__line"></span></p>
+            <h2 class="h2" data-reveal data-i18n="why.title">Ta’limning yangi <em>standarti</em></h2>
+          </header>
+
+          <div class="bento" data-stagger>
+            <article class="card bento__item bento__item--wide tilt" data-reveal>
+              <div class="icon">
+                <svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5-10-5Z" /><path d="M6 10.5V15c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5" /><path d="M22 8v6" /></svg>
+              </div>
+              <h3 data-i18n="why.1.title">Tajribali ustozlar</h3>
+              <p data-i18n="why.1.text">O‘z sohasining mutaxassislari bilim va ilhom ulashadi.</p>
+              <span class="bento__deco bento__deco--rings"></span>
+            </article>
+            <article class="card bento__item bento__item--wide tilt" data-reveal>
+              <div class="icon">
+                <svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5" /><path d="m3 17 9 5 9-5" /></svg>
+              </div>
+              <h3 data-i18n="why.2.title">Zamonaviy ekotizim</h3>
+              <p data-i18n="why.2.text">Barcha ta’lim jarayoni bitta raqamli makonda.</p>
+              <span class="bento__deco bento__deco--grid"></span>
+            </article>
+            <article class="card bento__item tilt" data-reveal>
+              <div class="icon">
+                <svg viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="m7 15 4-5 4 3 5-7" /></svg>
+              </div>
+              <h3 data-i18n="why.3.title">Natijani kuzatish</h3>
+              <p data-i18n="why.3.text">Har bir qadamingiz aniq va tushunarli ko‘rinishda.</p>
+            </article>
+            <article class="card bento__item tilt" data-reveal>
+              <div class="icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+              </div>
+              <h3 data-i18n="why.4.title">Moslashuvchan ta’lim</h3>
+              <p data-i18n="why.4.text">O‘zingizga qulay vaqt va joyda o‘rganing.</p>
+            </article>
+            <article class="card bento__item tilt" data-reveal>
+              <div class="icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6" /><path d="m8.5 14-1.5 8 5-3 5 3-1.5-8" /></svg>
+              </div>
+              <h3 data-i18n="why.5.title">Yutuqlar</h3>
+              <p data-i18n="why.5.text">Har bir muvaffaqiyat e’tirof etiladi va rag‘batlantiriladi.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MENTORS ============ -->
+      <section class="section mentors" id="mentors">
+        <div class="container">
+          <header class="section__head">
+            <div>
+              <p class="eyebrow" data-reveal><span class="eyebrow__line"></span><span data-i18n="mentors.eyebrow">Ustozlar</span></p>
+              <h2 class="h2" data-reveal data-i18n="mentors.title">Ilhom beruvchi <em>ustozlar</em></h2>
+              <p class="lead" data-reveal data-i18n="mentors.sub">Bilimni sevgi bilan ulashadigan mutaxassislar jamoasi.</p>
+            </div>
+          </header>
+
+          <div class="mentors__grid" data-stagger>
+            <article class="mentor tilt" data-reveal>
+              <div class="mentor__photo"><span class="sample" data-i18n="common.sample">Namuna</span><b>En</b></div>
+              <h3 data-i18n="mentors.name">Ustoz ismi</h3>
+              <p><span data-course="0">Ingliz tili</span> · <span data-i18n="mentors.exp1">8+ yil tajriba</span></p>
+            </article>
+            <article class="mentor tilt" data-reveal>
+              <div class="mentor__photo"><span class="sample" data-i18n="common.sample">Namuna</span><b>한</b></div>
+              <h3 data-i18n="mentors.name">Ustoz ismi</h3>
+              <p><span data-course="1">Koreys tili</span> · <span data-i18n="mentors.exp2">6+ yil tajriba</span></p>
+            </article>
+            <article class="mentor tilt" data-reveal>
+              <div class="mentor__photo"><span class="sample" data-i18n="common.sample">Namuna</span><b>∑</b></div>
+              <h3 data-i18n="mentors.name">Ustoz ismi</h3>
+              <p><span data-course="9">Matematika</span> · <span data-i18n="mentors.exp3">10+ yil tajriba</span></p>
+            </article>
+            <article class="mentor tilt" data-reveal>
+              <div class="mentor__photo"><span class="sample" data-i18n="common.sample">Namuna</span><b>H₂</b></div>
+              <h3 data-i18n="mentors.name">Ustoz ismi</h3>
+              <p><span data-course="11">Kimyo</span> · <span data-i18n="mentors.exp4">7+ yil tajriba</span></p>
+            </article>
+          </div>
+          <p class="note" data-reveal data-i18n="mentors.note">Namuna profillar — haqiqiy ustozlar tez orada qo‘shiladi.</p>
+        </div>
+      </section>
+
+      <!-- ============ RESULTS ============ -->
+      <section class="section results" id="results">
+        <div class="container">
+          <header class="section__head section__head--center">
+            <p class="eyebrow" data-reveal><span class="eyebrow__line"></span><span data-i18n="results.eyebrow">Natijalar</span><span class="eyebrow__line"></span></p>
+            <h2 class="h2" data-reveal data-i18n="results.title">Raqamlarda <em>M.ACADEMY</em></h2>
+          </header>
+
+          <div class="stats" data-stagger>
+            <div class="stat" data-reveal>
+              <span class="sample" data-i18n="common.sample">Namuna</span>
+              <b><span data-count="1200">0</span>+</b>
+              <small data-i18n="results.s1">O‘quvchilar</small>
+            </div>
+            <div class="stat" data-reveal>
+              <b><span data-count="16">0</span></b>
+              <small data-i18n="results.s2">Yo‘nalishlar</small>
+            </div>
+            <div class="stat" data-reveal>
+              <span class="sample" data-i18n="common.sample">Namuna</span>
+              <b><span data-count="40">0</span>+</b>
+              <small data-i18n="results.s3">Ustozlar</small>
+            </div>
+            <div class="stat" data-reveal>
+              <span class="sample" data-i18n="common.sample">Namuna</span>
+              <b><span data-count="98">0</span>%</b>
+              <small data-i18n="results.s4">Mamnuniyat</small>
+            </div>
+          </div>
+
+          <div class="wins" data-stagger>
+            <article class="card win tilt" data-reveal>
+              <span class="sample" data-i18n="common.sample">Namuna</span>
+              <h3 data-i18n="results.w1.title">Xalqaro sertifikatlar</h3>
+              <p data-i18n="results.w1.text">IELTS, TOPIK, HSK va boshqa imtihon natijalari shu yerda ko‘rsatiladi.</p>
+            </article>
+            <article class="card win tilt" data-reveal>
+              <span class="sample" data-i18n="common.sample">Namuna</span>
+              <h3 data-i18n="results.w2.title">Olimpiada g‘oliblari</h3>
+              <p data-i18n="results.w2.text">Fan olimpiadalaridagi yutuqlar uchun joy.</p>
+            </article>
+            <article class="card win tilt" data-reveal>
+              <span class="sample" data-i18n="common.sample">Namuna</span>
+              <h3 data-i18n="results.w3.title">Universitetga qabul</h3>
+              <p data-i18n="results.w3.text">Talabalarimizning oliy ta’limdagi muvaffaqiyatlari.</p>
+            </article>
+          </div>
+          <p class="note" data-reveal data-i18n="results.note">Namuna qiymatlar — haqiqiy ma’lumotlar keyinroq kiritiladi.</p>
+        </div>
+      </section>
+
+      <!-- ============ PATH ============ -->
+      <section class="path" id="path">
+        <div class="path__pin">
+          <div class="container path__head">
+            <p class="eyebrow" data-reveal><span class="eyebrow__line"></span><span data-i18n="path.eyebrow">O‘quv yo‘li</span></p>
+            <h2 class="h2" data-reveal data-i18n="path.title">Boshlang‘ichdan <em>mutaxassisgacha</em></h2>
+          </div>
+          <div class="path__viewport">
+            <div class="path__track" id="path-track">
+              <div class="path__line"><span id="path-fill"></span></div>
+              <article class="step">
+                <span class="step__num">01</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.1.title">Boshlang‘ich</h3>
+                <p data-i18n="path.1.text">Daraja aniqlanadi, maqsadlar belgilanadi.</p>
+              </article>
+              <article class="step">
+                <span class="step__num">02</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.2.title">Asos</h3>
+                <p data-i18n="path.2.text">Mustahkam poydevor va to‘g‘ri odatlar.</p>
+              </article>
+              <article class="step">
+                <span class="step__num">03</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.3.title">O‘rta</h3>
+                <p data-i18n="path.3.text">Bilimlar amaliyot bilan mustahkamlanadi.</p>
+              </article>
+              <article class="step">
+                <span class="step__num">04</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.4.title">Yuqori</h3>
+                <p data-i18n="path.4.text">Murakkab mavzular va imtihonlarga tayyorgarlik.</p>
+              </article>
+              <article class="step">
+                <span class="step__num">05</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.5.title">Mutaxassis</h3>
+                <p data-i18n="path.5.text">Erkin qo‘llash va yangi cho‘qqilar.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ STORIES ============ -->
+      <section class="section stories" id="stories">
+        <div class="container">
+          <header class="section__head">
+            <div>
+              <p class="eyebrow" data-reveal><span class="eyebrow__line"></span><span data-i18n="stories.eyebrow">O‘quvchilar fikri</span></p>
+              <h2 class="h2" data-reveal data-i18n="stories.title">Muvaffaqiyat <em>hikoyalari</em></h2>
+            </div>
+          </header>
+          <div class="stories__grid" data-stagger>
+            <figure class="card story tilt" data-reveal>
+              <span class="sample" data-i18n="common.sample">Namuna</span>
+              <span class="story__mark">“</span>
+              <blockquote data-i18n="stories.quote">Bu yerda o‘quvchining haqiqiy fikri joylashadi.</blockquote>
+              <figcaption><i></i><span><b data-i18n="stories.name">O‘quvchi ismi</b><small data-i18n="stories.course">Kurs nomi</small></span></figcaption>
+            </figure>
+            <figure class="card story tilt" data-reveal>
+              <span class="sample" data-i18n="common.sample">Namuna</span>
+              <span class="story__mark">“</span>
+              <blockquote data-i18n="stories.quote">Bu yerda o‘quvchining haqiqiy fikri joylashadi.</blockquote>
+              <figcaption><i></i><span><b data-i18n="stories.name">O‘quvchi ismi</b><small data-i18n="stories.course">Kurs nomi</small></span></figcaption>
+            </figure>
+            <figure class="card story tilt" data-reveal>
+              <span class="sample" data-i18n="common.sample">Namuna</span>
+              <span class="story__mark">“</span>
+              <blockquote data-i18n="stories.quote">Bu yerda o‘quvchining haqiqiy fikri joylashadi.</blockquote>
+              <figcaption><i></i><span><b data-i18n="stories.name">O‘quvchi ismi</b><small data-i18n="stories.course">Kurs nomi</small></span></figcaption>
+            </figure>
+          </div>
+          <p class="note" data-reveal data-i18n="stories.note">Namuna joylar — haqiqiy fikrlar o‘quvchilar roziligi bilan qo‘shiladi.</p>
+        </div>
+      </section>
+
+      <!-- ============ NIGINA ============ -->
+      <section class="section nigina" id="nigina">
+        <div class="container nigina__grid">
+          <div class="nigina__copy">
+            <span class="badge" data-reveal><i></i><span data-i18n="nigina.badge">Ishlab chiqilmoqda</span></span>
+            <p class="eyebrow" data-reveal><span class="eyebrow__line"></span><span data-i18n="nigina.eyebrow">Sun’iy intellekt</span></p>
+            <h2 class="nigina__title" data-reveal>NIGINA</h2>
+            <p class="nigina__sub" data-reveal data-i18n="nigina.sub">Sizning aqlli o‘quv yordamchingiz</p>
+            <p class="lead" data-reveal data-i18n="nigina.text">
+              NIGINA — M.ACADEMY’ning sun’iy intellektga asoslangan yordamchisi. U savollaringizga javob beradi,
+              mashqlarni tushuntiradi va o‘quv yo‘lingizni shaxsiylashtiradi.
+            </p>
+            <ul class="chips" data-reveal>
+              <li data-i18n="nigina.c1">24/7 savol-javob</li>
+              <li data-i18n="nigina.c2">Shaxsiy tavsiyalar</li>
+              <li data-i18n="nigina.c3">Mashqlar tahlili</li>
+              <li data-i18n="nigina.c4">Uch tilda muloqot</li>
+            </ul>
+            <p class="note note--left" data-reveal data-i18n="nigina.note">Tez orada — NIGINA keyingi bosqichlarda ishga tushiriladi.</p>
+          </div>
+
+          <div class="nigina__stage" data-reveal>
+            <div class="orb" aria-hidden="true">
+              <span class="orb__ring orb__ring--a"></span>
+              <span class="orb__ring orb__ring--b"></span>
+              <span class="orb__ring orb__ring--c"></span>
+              <span class="orb__core"></span>
+            </div>
+            <div class="chat" id="chat" aria-hidden="true">
+              <div class="chat__head">
+                <i></i><b>NIGINA</b><small data-i18n="nigina.demo">demo</small>
+              </div>
+              <div class="chat__body" id="chat-body"></div>
+              <div class="chat__input"><span data-i18n="nigina.placeholder">Savolingizni yozing…</span><i></i></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CTA ============ -->
+      <section class="section cta" id="contact">
+        <div class="container">
+          <div class="cta__panel" data-reveal>
+            <span class="cta__border" aria-hidden="true"></span>
+            <img class="cta__mark" src="/img/logo-mark.webp" alt="" width="543" height="531" loading="lazy" />
+            <p class="eyebrow"><span class="eyebrow__line"></span><span data-i18n="cta.eyebrow">Boshlash vaqti</span><span class="eyebrow__line"></span></p>
+            <h2 class="h2 cta__title" data-i18n="cta.title">Ta’lim sayohatingizni <em>bugun</em> boshlang.</h2>
+            <p class="lead" data-i18n="cta.sub">Birinchi qadamni qo‘ying — qolganida biz yoningizdamiz.</p>
+            <div class="cta__buttons">
+              <button type="button" class="btn btn--gold magnetic" data-open-form>
+                <span data-i18n="cta.signup">Ro‘yxatdan o‘tish</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </button>
+              <a class="btn btn--ghost magnetic" id="contact-link" href="#" data-i18n="cta.contact">Bog‘lanish</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="footer">
+      <div class="container footer__grid">
+        <div class="footer__brand">
+          <img src="/img/logo-full.webp" alt="M Academy — Online School" width="874" height="705" loading="lazy" />
+          <p data-i18n="footer.tagline">Bilim, texnologiya va ilhom uchrashadigan raqamli maktab.</p>
+        </div>
+        <nav class="footer__col">
+          <b data-i18n="footer.nav">Bo‘limlar</b>
+          <a href="#about" data-i18n="nav.about">Akademiya</a>
+          <a href="#courses" data-i18n="nav.courses">Kurslar</a>
+          <a href="#mentors" data-i18n="nav.mentors">Ustozlar</a>
+          <a href="#results" data-i18n="nav.results">Natijalar</a>
+        </nav>
+        <nav class="footer__col">
+          <b data-i18n="footer.social">Ijtimoiy tarmoqlar</b>
+          <a href="#" data-social="telegram">Telegram</a>
+          <a href="#" data-social="instagram">Instagram</a>
+          <a href="#" data-social="youtube">YouTube</a>
+        </nav>
+      </div>
+      <div class="container footer__bottom">
+        <span>© <span id="year">2026</span> M.ACADEMY. <span data-i18n="footer.rights">Barcha huquqlar himoyalangan.</span></span>
+        <a href="#top" data-i18n="footer.top">Yuqoriga ↑</a>
+      </div>
+    </footer>
+
+    <!-- ============ SIGN-UP DIALOG ============ -->
+    <dialog class="modal" id="signup" data-lenis-prevent>
+      <form class="modal__box" id="signup-form" method="dialog" novalidate>
+        <button type="button" class="modal__close" data-close-form aria-label="Close">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+        <img src="/img/logo-mark.webp" alt="" width="543" height="531" class="modal__mark" />
+        <h2 data-i18n="form.title">Ro‘yxatdan o‘tish</h2>
+        <p data-i18n="form.sub">Ma’lumotlaringizni qoldiring — biz siz bilan bog‘lanamiz.</p>
+
+        <label class="field">
+          <span data-i18n="form.name">Ismingiz</span>
+          <input type="text" name="name" autocomplete="name" required minlength="2" />
+        </label>
+        <label class="field">
+          <span data-i18n="form.phone">Telefon raqamingiz</span>
+          <input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="+998 __ ___ __ __" required />
+        </label>
+        <label class="field">
+          <span data-i18n="form.course">Yo‘nalish</span>
+          <select name="course" id="signup-course"></select>
+        </label>
+
+        <p class="modal__error" id="signup-error" role="alert" hidden data-i18n="form.error">Iltimos, ism va telefon raqamini to‘g‘ri kiriting.</p>
+        <button type="submit" class="btn btn--gold btn--block"><span data-i18n="form.submit">Ariza yuborish</span></button>
+
+        <div class="modal__done" id="signup-done" hidden>
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" /><path d="m15 24.5 6.5 6.5L34 18" /></svg>
+          <h3 data-i18n="form.doneTitle">Rahmat!</h3>
+          <p data-i18n="form.doneText">Arizangiz qabul qilindi. Tez orada siz bilan bog‘lanamiz.</p>
+          <button type="button" class="btn btn--ghost" data-close-form data-i18n="form.close">Yopish</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
