@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useI18n } from '../i18n/index.jsx';
 import { reducedMotion, wait } from '../lib/env.js';
+import { getLenis } from '../lib/scroll.js';
 
 /* Canvas / animation-heavy pieces. The WebGL code itself lives in src/lib. */
 
@@ -89,11 +90,14 @@ export function LearningPath() {
   useEffect(() => {
     let mm = null;
     let cancelled = false;
+    let unsync = null;
 
     import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
       if (cancelled) return;
       gsap.registerPlugin(ScrollTrigger);
       refresh.current = () => ScrollTrigger.refresh();
+      // keep the pinned section in step with the smooth scroll
+      unsync = getLenis()?.on('scroll', ScrollTrigger.update) ?? null;
 
       const steps = [...track.current.querySelectorAll('.step')];
       const mark = (progress) =>
@@ -134,6 +138,7 @@ export function LearningPath() {
 
     return () => {
       cancelled = true;
+      unsync?.();
       mm?.revert(); // also puts the pinned element back where React expects it
     };
   }, []);

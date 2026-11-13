@@ -3,7 +3,9 @@ import { Link, NavLink, Routes, useLocation } from 'react-router-dom';
 import { LANGS, useI18n } from '../i18n/index.jsx';
 import { CONFIG } from '../data/courses.js';
 import { reducedMotion } from '../lib/env.js';
+import { lockScroll, scrollToTop, unlockScroll } from '../lib/scroll.js';
 import { usePointerFx, useReveal } from '../hooks/usePageFx.js';
+import Cursor from './Cursor.jsx';
 
 const PageContext = createContext({ ready: () => {} });
 
@@ -97,7 +99,7 @@ function Footer() {
         <span>
           © {new Date().getFullYear()} M.ACADEMY. {t('footer.rights')}
         </span>
-        <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' })}>
+        <button type="button" onClick={() => scrollToTop()}>
           {t('footer.top')}
         </button>
       </div>
@@ -144,7 +146,7 @@ export default function Layout({ children }) {
     const id = setTimeout(
       () => {
         setShown(location);
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        scrollToTop({ immediate: true });
       },
       reducedMotion ? 0 : 420,
     );
@@ -160,6 +162,9 @@ export default function Layout({ children }) {
 
   useEffect(() => {
     document.body.classList.toggle('menu-open', menu);
+    if (!menu) return undefined;
+    lockScroll(); // the page must not scroll behind the open menu
+    return unlockScroll;
   }, [menu]);
 
   useEffect(() => {
@@ -202,6 +207,7 @@ export default function Layout({ children }) {
   return (
     <PageContext.Provider value={{ ready }}>
       <div className={`curtain${covered ? ' is-on' : ''}`} aria-hidden="true" />
+      <Cursor />
       <div className="scroll-progress" aria-hidden="true">
         <span ref={barRef} />
       </div>

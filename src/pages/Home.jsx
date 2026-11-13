@@ -10,6 +10,7 @@ import Icon from '../components/Icon.jsx';
 import { COURSES } from '../data/courses.js';
 import { POSTS } from '../data/news.js';
 import { reducedMotion, wait } from '../lib/env.js';
+import { lockScroll, scrollToElement, unlockScroll } from '../lib/scroll.js';
 
 /** Eight directions picked for the home page; the full list is on /courses. */
 const FEATURED = [0, 1, 2, 4, 9, 10, 13, 15];
@@ -79,8 +80,15 @@ export default function Home() {
         },
       });
 
-    const start = () => {
+    let locked = false;
+    const release = () => {
       document.body.classList.remove('is-loading');
+      if (locked) unlockScroll();
+      locked = false;
+    };
+
+    const start = () => {
+      release();
       ready();
       scene.current?.intro();
       copy.current?.play();
@@ -89,6 +97,8 @@ export default function Home() {
     (async () => {
       if (el) {
         document.body.classList.add('is-loading');
+        lockScroll();
+        locked = true;
         ready(); // the preloader covers the page, so the curtain can lift underneath it
         setProgress(40, 1.4);
       }
@@ -112,7 +122,7 @@ export default function Home() {
 
     return () => {
       cancelled = true;
-      document.body.classList.remove('is-loading');
+      release();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -214,7 +224,15 @@ export default function Home() {
           <i />
           <i />
         </div>
-        <a className="hero__scroll" href="#intro" aria-label="Scroll">
+        <a
+          className="hero__scroll"
+          href="#intro"
+          aria-label="Scroll"
+          onClick={(e) => {
+            e.preventDefault();
+            scrollToElement(document.getElementById('intro'));
+          }}
+        >
           <i />
         </a>
       </section>

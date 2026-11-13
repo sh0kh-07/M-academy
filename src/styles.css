@@ -35,7 +35,6 @@
 html {
   -webkit-text-size-adjust: 100%;
   scrollbar-color: #3a3220 var(--bg);
-  scroll-behavior: smooth;
   overflow-x: clip;
 }
 
@@ -481,6 +480,46 @@ svg {
 .preloader__meta b {
   font-weight: 500;
   color: var(--gold-l);
+}
+
+/* a gold ring that trails the mouse (desktop only, see Cursor.jsx) */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 110;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  will-change: transform;
+}
+
+.cursor[data-on] {
+  opacity: 1;
+}
+
+.cursor i {
+  position: absolute;
+  top: -19px;
+  left: -19px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(217, 178, 106, 0.75);
+  transition:
+    scale 0.4s var(--ease),
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.cursor[data-hover] i {
+  scale: 1.75;
+  background: rgba(217, 178, 106, 0.1);
+  border-color: rgba(246, 227, 176, 0.95);
+}
+
+.cursor[data-down] i {
+  scale: 0.8;
 }
 
 .scroll-progress {
@@ -3185,10 +3224,6 @@ svg {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
   *,
   *::before,
   *::after {
