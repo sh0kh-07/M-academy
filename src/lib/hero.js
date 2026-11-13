@@ -530,7 +530,13 @@ export async function createHero(
       io.disconnect();
       window.removeEventListener('pointermove', onPointer);
       document.removeEventListener('visibilitychange', onVisibility);
+      geometry.dispose();
+      Object.values(art).forEach((a) => {
+        a?.map.dispose();
+        a?.mask?.dispose();
+      });
       renderer.dispose();
+      renderer.forceContextLoss();
     },
   };
 

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
-import markSvg from './assets/mark.svg?raw';
+import markSvg from '../assets/mark.svg?raw';
 
 /**
  * The M mark, extruded into solid gold from the traced logo outline,
@@ -115,25 +115,37 @@ export function createEmblem(canvas, { reducedMotion = false } = {}) {
     renderer.setAnimationLoop(on ? tick : null);
   }
 
-  window.addEventListener(
-    'pointermove',
-    (e) => {
-      const rect = canvas.getBoundingClientRect();
-      state.px = Math.max(-1.4, Math.min(1.4, ((e.clientX - rect.left) / rect.width) * 2 - 1));
-      state.py = Math.max(-1.4, Math.min(1.4, ((e.clientY - rect.top) / rect.height) * 2 - 1));
-    },
-    { passive: true },
-  );
+  const onPointer = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    state.px = Math.max(-1.4, Math.min(1.4, ((e.clientX - rect.left) / rect.width) * 2 - 1));
+    state.py = Math.max(-1.4, Math.min(1.4, ((e.clientY - rect.top) / rect.height) * 2 - 1));
+  };
+  window.addEventListener('pointermove', onPointer, { passive: true });
 
   let visible = false;
   const sync = () => setRunning(visible && !document.hidden);
-  new ResizeObserver(layout).observe(canvas);
-  new IntersectionObserver(([entry]) => {
+  const ro = new ResizeObserver(layout);
+  ro.observe(canvas);
+  const io = new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
     sync();
-  }).observe(canvas);
+  });
+  io.observe(canvas);
   document.addEventListener('visibilitychange', sync);
 
   layout();
   tick(performance.now());
+
+  return {
+    dispose() {
+      setRunning(false);
+      ro.disconnect();
+      io.disconnect();
+      window.removeEventListener('pointermove', onPointer);
+      document.removeEventListener('visibilitychange', sync);
+      geo.dispose();
+      renderer.dispose();
+      renderer.forceContextLoss();
+    },
+  };
 }

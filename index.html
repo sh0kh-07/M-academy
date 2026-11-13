@@ -1,161 +1,30 @@
 <!doctype html>
 <html lang="uz">
   <head>
-    <!-- @include head.html -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>M.ACADEMY • Online School — Beyond Learning. Beyond Limits.</title>
     <meta
       name="description"
       content="M.ACADEMY — zamonaviy onlayn ta’lim ekotizimi: xorijiy tillar, aniq va ijtimoiy fanlar bo‘yicha 16 ta yo‘nalish."
     />
+    <meta name="theme-color" content="#05070f" />
+    <meta property="og:site_name" content="M.ACADEMY" />
+    <meta property="og:image" content="/img/icon-512.png" />
+    <link rel="icon" type="image/png" href="/img/favicon.png" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Manrope:wght@400..700&family=Unbounded:wght@400..700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="preload" as="image" href="/img/logo-mark.webp" />
   </head>
 
-  <body class="is-entering" data-page="home" id="top">
-    <!-- shown once per visit, before the first shot fades up -->
-    <div class="preloader" id="preloader" aria-hidden="true">
-      <div class="preloader__inner">
-        <img class="preloader__mark" src="/img/logo-mark.webp" alt="" width="543" height="531" />
-        <div class="preloader__bar"><span id="preloader-bar"></span></div>
-        <div class="preloader__meta">
-          <span>M.ACADEMY</span>
-          <span><b id="preloader-num">0</b>%</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- @include chrome.html -->
-
-    <main>
-      <!-- ============ HERO ============ -->
-      <section class="hero" id="hero">
-        <canvas class="hero__canvas" id="hero-canvas" aria-hidden="true"></canvas>
-        <div class="hero__shade" aria-hidden="true"></div>
-
-        <div class="container hero__content">
-          <p class="eyebrow hero__eyebrow"><span class="eyebrow__line"></span>M.ACADEMY • ONLINE SCHOOL</p>
-          <h1 class="hero__title" aria-label="Beyond Learning. Beyond Limits.">
-            <span class="hero__line"><span>BEYOND LEARNING.</span></span>
-            <span class="hero__line hero__line--gold"><span>BEYOND LIMITS.</span></span>
-          </h1>
-          <p class="hero__sub" data-i18n="hero.sub">Kelajagingizni yangi bilimlar bilan yarating.</p>
-          <div class="hero__cta">
-            <a class="btn btn--gold magnetic" href="courses.html">
-              <span data-i18n="hero.cta1">Kurslarni ko‘rish</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-            </a>
-            <a class="btn btn--ghost magnetic" href="about.html" data-i18n="hero.cta2">Biz bilan o‘rganing</a>
-          </div>
-          <ul class="hero__tags">
-            <li data-i18n="hero.tag1">Tillar</li>
-            <li data-i18n="hero.tag2">Aniq fanlar</li>
-            <li data-i18n="hero.tag3">Ijtimoiy fanlar</li>
-          </ul>
-        </div>
-
-        <!-- one bar per shot of the backdrop -->
-        <div class="hero__shots" id="hero-shots" aria-hidden="true"><i></i><i></i><i></i></div>
-        <a class="hero__scroll" href="#intro" aria-label="Scroll"><i></i></a>
-      </section>
-
-      <!-- ============ MARQUEE ============ -->
-      <div class="marquee" aria-hidden="true">
-        <div class="marquee__track" id="marquee"></div>
-      </div>
-
-      <!-- ============ ACADEMY (teaser) ============ -->
-      <section class="section intro" id="intro">
-        <div class="container intro__grid">
-          <div class="intro__copy">
-            <p class="eyebrow" data-reveal>
-              <span class="eyebrow__line"></span><span data-i18n="about.eyebrow">Akademiya</span>
-            </p>
-            <h2 class="h2" data-reveal data-i18n="about.title">Zamonaviy onlayn ta’lim <em>ekotizimi</em></h2>
-            <p class="lead" data-reveal data-i18n="about.text">
-              M.ACADEMY — bilim, texnologiya va ilhom bir joyda uchrashadigan raqamli maktab. Biz har bir o‘quvchiga
-              o‘z sur’atida, istalgan joydan, eng yaxshi ustozlar bilan o‘rganish imkonini yaratamiz.
-            </p>
-            <a class="link-arrow" href="about.html" data-reveal>
-              <span data-i18n="common.more">Batafsil</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-            </a>
-          </div>
-
-          <div class="features features--stack">
-            <article class="card feature tilt" data-reveal>
-              <span class="card__num">01</span>
-              <div class="icon">
-                <svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5" /><path d="m3 17 9 5 9-5" /></svg>
-              </div>
-              <div>
-                <h3 data-i18n="about.f1.title">Yagona ekotizim</h3>
-                <p data-i18n="about.f1.text">Darslar, materiallar va natijalar — barchasi bitta qulay platformada jamlanadi.</p>
-              </div>
-            </article>
-            <article class="card feature tilt" data-reveal>
-              <span class="card__num">02</span>
-              <div class="icon">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" /></svg>
-              </div>
-              <div>
-                <h3 data-i18n="about.f2.title">Shaxsiy yo‘l</h3>
-                <p data-i18n="about.f2.text">Har bir o‘quvchi uchun darajasi va maqsadiga mos o‘quv yo‘nalishi.</p>
-              </div>
-            </article>
-            <article class="card feature tilt" data-reveal>
-              <span class="card__num">03</span>
-              <div class="icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /><path d="m12 7.5 1.3 3.2 3.2 1.3-3.2 1.3-1.3 3.2-1.3-3.2L7.5 12l3.2-1.3L12 7.5Z" /></svg>
-              </div>
-              <div>
-                <h3 data-i18n="about.f3.title">Kelajak texnologiyalari</h3>
-                <p data-i18n="about.f3.text">Sun’iy intellekt va interaktiv vositalar bilan boyitilgan ta’lim tajribasi.</p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ COURSES (preview) ============ -->
-      <section class="section courses">
-        <div class="container">
-          <header class="section__head">
-            <div>
-              <p class="eyebrow" data-reveal>
-                <span class="eyebrow__line"></span><span data-i18n="courses.eyebrow">Kurslar</span>
-              </p>
-              <h2 class="h2" data-reveal data-i18n="courses.title">Bilim olamiga <em>yo‘l oching</em></h2>
-              <p class="lead" data-reveal data-i18n="courses.sub">
-                Xorijiy tillardan tortib aniq va ijtimoiy fanlargacha — 16 ta yo‘nalish.
-              </p>
-            </div>
-            <a class="btn btn--ghost" href="courses.html" data-reveal>
-              <span data-i18n="courses.allLink">Barcha kurslar</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-            </a>
-          </header>
-          <!-- eight directions picked for the home page; the full list is on courses.html -->
-          <div class="courses__grid" id="courses-grid" data-featured="0,1,2,4,9,10,13,15"></div>
-        </div>
-      </section>
-
-      <!-- ============ NUMBERS ============ -->
-      <section class="section results">
-        <div class="container">
-          <header class="section__head section__head--center">
-            <p class="eyebrow" data-reveal>
-              <span class="eyebrow__line"></span><span data-i18n="results.eyebrow">Natijalar</span
-              ><span class="eyebrow__line"></span>
-            </p>
-            <h2 class="h2" data-reveal data-i18n="results.title">Raqamlarda <em>M.ACADEMY</em></h2>
-          </header>
-          <!-- @include stats.html -->
-          <p class="note" data-reveal data-i18n="results.note">Namuna qiymatlar — haqiqiy ma’lumotlar keyinroq kiritiladi.</p>
-        </div>
-      </section>
-
-      <!-- @include cta.html -->
-    </main>
-
-    <!-- @include footer.html -->
+  <body>
+    <div id="root"></div>
+    <noscript>M.ACADEMY — saytni ko‘rish uchun JavaScript’ni yoqing.</noscript>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

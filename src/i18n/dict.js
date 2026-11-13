@@ -1,30 +1,215 @@
 /* ------------------------------------------------------------------
-   Three languages. Uzbek lives in index.html (it is the default and
-   is read from the DOM on start); Russian and English live here.
-   Keys match the data-i18n attributes.
+   All interface text, in three languages. Keys are shared; a key that
+   is missing in Russian or English falls back to Uzbek.
+   News posts and course names live in src/data.
    ------------------------------------------------------------------ */
 
-const dict = {
-  // strings that only exist in JS (not present in the markup)
+export const dict = {
   uz: {
-    // used from JS on pages where the same words are not in the markup
+    'title.home': 'M.ACADEMY • Online School — Beyond Learning. Beyond Limits.',
+    'title.about': 'Akademiya — M.ACADEMY',
+    'title.courses': 'Kurslar — M.ACADEMY',
+    'title.results': 'Natijalar — M.ACADEMY',
+    'title.nigina': 'NIGINA — M.ACADEMY',
+    'title.news': 'Yangiliklar — M.ACADEMY',
+    'title.register': 'Ro‘yxatdan o‘tish — M.ACADEMY',
+    'title.notFound': 'Sahifa topilmadi — M.ACADEMY',
+    'meta.desc':
+      'M.ACADEMY — zamonaviy onlayn ta’lim ekotizimi: xorijiy tillar, aniq va ijtimoiy fanlar bo‘yicha 16 ta yo‘nalish.',
+
+    'nav.home': 'Bosh sahifa',
+    'nav.about': 'Akademiya',
+    'nav.courses': 'Kurslar',
+    'nav.results': 'Natijalar',
+    'nav.news': 'Yangiliklar',
+    'cta.signup': 'Ro‘yxatdan o‘tish',
+    'common.more': 'Batafsil',
+    'common.sample': 'Namuna',
+
+    'hero.sub': 'Kelajagingizni yangi bilimlar bilan yarating.',
+    'hero.cta1': 'Kurslarni ko‘rish',
+    'hero.cta2': 'Biz bilan o‘rganing',
+    'hero.tag1': 'Tillar',
+    'hero.tag2': 'Aniq fanlar',
+    'hero.tag3': 'Ijtimoiy fanlar',
+
+    'about.eyebrow': 'Akademiya',
+    'about.title': 'Zamonaviy onlayn ta’lim <em>ekotizimi</em>',
+    'about.text':
+      'M.ACADEMY — bilim, texnologiya va ilhom bir joyda uchrashadigan raqamli maktab. Biz har bir o‘quvchiga o‘z sur’atida, istalgan joydan, eng yaxshi ustozlar bilan o‘rganish imkonini yaratamiz.',
+    'about.f1.title': 'Yagona ekotizim',
+    'about.f1.text': 'Darslar, materiallar va natijalar — barchasi bitta qulay platformada jamlanadi.',
+    'about.f2.title': 'Shaxsiy yo‘l',
+    'about.f2.text': 'Har bir o‘quvchi uchun darajasi va maqsadiga mos o‘quv yo‘nalishi.',
+    'about.f3.title': 'Kelajak texnologiyalari',
+    'about.f3.text': 'Sun’iy intellekt va interaktiv vositalar bilan boyitilgan ta’lim tajribasi.',
+
+    'courses.eyebrow': 'Kurslar',
+    'courses.title': 'Bilim olamiga <em>yo‘l oching</em>',
+    'courses.sub': 'Xorijiy tillardan tortib aniq va ijtimoiy fanlargacha — 16 ta yo‘nalish.',
+    'courses.allLink': 'Barcha kurslar',
+    'courses.all': 'Barchasi',
     'courses.lang': 'Tillar',
     'courses.exact': 'Aniq fanlar',
     'courses.social': 'Ijtimoiy fanlar',
-    'reg.undecided': 'Hali tanlamadim',
-    'pass.namePh': 'Ismingiz',
-    'pass.trackPh': 'Tanlanmagan',
-    'meta.title': 'M.ACADEMY • Online School — Beyond Learning. Beyond Limits.',
-    'meta.desc':
-      'M.ACADEMY — zamonaviy onlayn ta’lim ekotizimi: xorijiy tillar, aniq va ijtimoiy fanlar bo‘yicha 16 ta yo‘nalish.',
+
+    'why.eyebrow': 'Nega M.ACADEMY',
+    'why.title': 'Ta’limning yangi <em>standarti</em>',
+    'why.1.title': 'Tajribali ustozlar',
+    'why.1.text': 'O‘z sohasining mutaxassislari bilim va ilhom ulashadi.',
+    'why.2.title': 'Zamonaviy ekotizim',
+    'why.2.text': 'Barcha ta’lim jarayoni bitta raqamli makonda.',
+    'why.3.title': 'Natijani kuzatish',
+    'why.3.text': 'Har bir qadamingiz aniq va tushunarli ko‘rinishda.',
+    'why.4.title': 'Moslashuvchan ta’lim',
+    'why.4.text': 'O‘zingizga qulay vaqt va joyda o‘rganing.',
+    'why.5.title': 'Yutuqlar',
+    'why.5.text': 'Har bir muvaffaqiyat e’tirof etiladi va rag‘batlantiriladi.',
+
+    'mentors.eyebrow': 'Ustozlar',
+    'mentors.title': 'Ilhom beruvchi <em>ustozlar</em>',
+    'mentors.sub': 'Bilimni sevgi bilan ulashadigan mutaxassislar jamoasi.',
+    'mentors.name': 'Ustoz ismi',
+    'mentors.exp1': '8+ yil tajriba',
+    'mentors.exp2': '6+ yil tajriba',
+    'mentors.exp3': '10+ yil tajriba',
+    'mentors.exp4': '7+ yil tajriba',
+    'mentors.note': 'Namuna profillar — haqiqiy ustozlar tez orada qo‘shiladi.',
+
+    'results.eyebrow': 'Natijalar',
+    'results.title': 'Raqamlarda <em>M.ACADEMY</em>',
+    'results.lead': 'O‘quvchilarimiz yutuqlari — bizning eng katta faxrimiz.',
+    'results.s1': 'O‘quvchilar',
+    'results.s2': 'Yo‘nalishlar',
+    'results.s3': 'Ustozlar',
+    'results.s4': 'Mamnuniyat',
+    'results.w1.title': 'Xalqaro sertifikatlar',
+    'results.w1.text': 'IELTS, TOPIK, HSK va boshqa imtihon natijalari shu yerda ko‘rsatiladi.',
+    'results.w2.title': 'Olimpiada g‘oliblari',
+    'results.w2.text': 'Fan olimpiadalaridagi yutuqlar uchun joy.',
+    'results.w3.title': 'Universitetga qabul',
+    'results.w3.text': 'Talabalarimizning oliy ta’limdagi muvaffaqiyatlari.',
+    'results.note': 'Namuna qiymatlar — haqiqiy ma’lumotlar keyinroq kiritiladi.',
+
+    'path.eyebrow': 'O‘quv yo‘li',
+    'path.title': 'Boshlang‘ichdan <em>mutaxassisgacha</em>',
+    'path.1.title': 'Boshlang‘ich',
+    'path.1.text': 'Daraja aniqlanadi, maqsadlar belgilanadi.',
+    'path.2.title': 'Asos',
+    'path.2.text': 'Mustahkam poydevor va to‘g‘ri odatlar.',
+    'path.3.title': 'O‘rta',
+    'path.3.text': 'Bilimlar amaliyot bilan mustahkamlanadi.',
+    'path.4.title': 'Yuqori',
+    'path.4.text': 'Murakkab mavzular va imtihonlarga tayyorgarlik.',
+    'path.5.title': 'Mutaxassis',
+    'path.5.text': 'Erkin qo‘llash va yangi cho‘qqilar.',
+
+    'stories.eyebrow': 'O‘quvchilar fikri',
+    'stories.title': 'Muvaffaqiyat <em>hikoyalari</em>',
+    'stories.quote': 'Bu yerda o‘quvchining haqiqiy fikri joylashadi.',
+    'stories.name': 'O‘quvchi ismi',
+    'stories.course': 'Kurs nomi',
+    'stories.note': 'Namuna joylar — haqiqiy fikrlar o‘quvchilar roziligi bilan qo‘shiladi.',
+
+    'nigina.badge': 'Ishlab chiqilmoqda',
+    'nigina.eyebrow': 'Sun’iy intellekt',
+    'nigina.sub': 'Sizning aqlli o‘quv yordamchingiz',
+    'nigina.text':
+      'NIGINA — M.ACADEMY’ning sun’iy intellektga asoslangan yordamchisi. U savollaringizga javob beradi, mashqlarni tushuntiradi va o‘quv yo‘lingizni shaxsiylashtiradi.',
+    'nigina.c1': '24/7 savol-javob',
+    'nigina.c2': 'Shaxsiy tavsiyalar',
+    'nigina.c3': 'Mashqlar tahlili',
+    'nigina.c4': 'Uch tilda muloqot',
+    'nigina.note': 'Tez orada — NIGINA keyingi bosqichlarda ishga tushiriladi.',
+    'nigina.demo': 'demo',
+    'nigina.placeholder': 'Savolingizni yozing…',
     'chat.q': 'Present Perfect qachon ishlatiladi?',
     'chat.a':
       'Present Perfect o‘tmishda bo‘lib, natijasi hozir muhim bo‘lgan ish-harakatlar uchun ishlatiladi. Masalan: “I have finished my homework.”',
     'chat.q2': 'Yana bitta misol bering',
     'chat.a2': '“She has visited Samarkand twice.” — u Samarqandda ikki marta bo‘lgan, va bu tajriba hozir ham ahamiyatli.',
-  },
 
+    'news.eyebrow': 'Yangiliklar',
+    'news.title': 'Akademiya <em>yangiliklari</em>',
+    'news.lead': 'E’lonlar, yangi kurslar va akademiya hayotidan xabarlar.',
+    'news.latest': 'So‘nggi <em>yangiliklar</em>',
+    'news.allLink': 'Barcha yangiliklar',
+    'news.all': 'Barchasi',
+    'news.cat.announce': 'E’lon',
+    'news.cat.course': 'Kurslar',
+    'news.cat.event': 'Tadbir',
+    'news.cat.tech': 'Texnologiya',
+    'news.read': 'O‘qish',
+    'news.minutes': 'daqiqa o‘qish',
+    'news.back': 'Barcha yangiliklar',
+    'news.more': 'Boshqa <em>yangiliklar</em>',
+    'news.note': 'Namuna postlar — haqiqiy yangiliklar keyinroq qo‘shiladi.',
+    'news.missing': 'Bu yangilik topilmadi.',
+
+    'cta.eyebrow': 'Boshlash vaqti',
+    'cta.title': 'Ta’lim sayohatingizni <em>bugun</em> boshlang.',
+    'cta.sub': 'Birinchi qadamni qo‘ying — qolganida biz yoningizdamiz.',
+
+    'footer.tagline': 'Bilim, texnologiya va ilhom uchrashadigan raqamli maktab.',
+    'footer.nav': 'Bo‘limlar',
+    'footer.social': 'Ijtimoiy tarmoqlar',
+    'footer.rights': 'Barcha huquqlar himoyalangan.',
+    'footer.top': 'Yuqoriga ↑',
+
+    'reg.eyebrow': 'Ro‘yxatdan o‘tish',
+    'reg.title': 'Kelajagingiz shu yerdan <em>boshlanadi</em>',
+    'reg.lead': 'Uch qadam — va siz M.ACADEMY o‘quvchisisiz.',
+    'reg.s1': 'Yo‘nalish',
+    'reg.s2': 'Ma’lumot',
+    'reg.s3': 'Tayyor',
+    'reg.q1': 'Qaysi yo‘nalish sizni qiziqtiradi?',
+    'reg.hint1': 'Keyinroq o‘zgartirish mumkin',
+    'reg.undecided': 'Hali tanlamadim',
+    'reg.next': 'Davom etish',
+    'reg.back': 'Orqaga',
+    'reg.q2': 'O‘zingiz haqingizda',
+    'reg.note': 'Ma’lumotlaringiz faqat siz bilan bog‘lanish uchun ishlatiladi.',
+    'reg.doneTitle': 'Arizangiz qabul qilindi',
+    'reg.doneText': 'Tez orada siz bilan bog‘lanamiz.',
+    'reg.home': 'Bosh sahifaga',
+    'form.name': 'Ismingiz',
+    'form.phone': 'Telefon raqamingiz',
+    'form.error': 'Iltimos, ism va telefon raqamini to‘g‘ri kiriting.',
+    'form.submit': 'Ariza yuborish',
+    'pass.kind': 'Talaba arizasi',
+    'pass.name': 'Ism',
+    'pass.track': 'Yo‘nalish',
+    'pass.date': 'Sana',
+    'pass.namePh': 'Ismingiz',
+    'pass.trackPh': 'Tanlanmagan',
+    'pass.stamp': 'Qabul qilindi',
+
+    'notFound.title': 'Sahifa <em>topilmadi</em>',
+    'notFound.text': 'Bu manzilda hech narsa yo‘q. Bosh sahifadan davom eting.',
+  },
   ru: {
+    'title.home': 'M.ACADEMY • Онлайн-школа — Beyond Learning. Beyond Limits.',
+    'title.news': 'Новости — M.ACADEMY',
+    'title.notFound': 'Страница не найдена — M.ACADEMY',
+    'nav.news': 'Новости',
+    'news.eyebrow': 'Новости',
+    'news.title': '<em>Новости</em> академии',
+    'news.lead': 'Объявления, новые курсы и жизнь академии.',
+    'news.latest': 'Последние <em>новости</em>',
+    'news.allLink': 'Все новости',
+    'news.all': 'Все',
+    'news.cat.announce': 'Объявление',
+    'news.cat.course': 'Курсы',
+    'news.cat.event': 'Событие',
+    'news.cat.tech': 'Технологии',
+    'news.read': 'Читать',
+    'news.minutes': 'мин. чтения',
+    'news.back': 'Все новости',
+    'news.more': 'Другие <em>новости</em>',
+    'news.note': 'Посты-примеры — настоящие новости будут добавлены позже.',
+    'news.missing': 'Такой новости нет.',
+    'notFound.title': 'Страница <em>не найдена</em>',
+    'notFound.text': 'По этому адресу ничего нет. Продолжите с главной страницы.',
     'title.about': 'Академия — M.ACADEMY',
     'title.courses': 'Курсы — M.ACADEMY',
     'title.results': 'Результаты — M.ACADEMY',
@@ -57,7 +242,6 @@ const dict = {
     'pass.namePh': 'Ваше имя',
     'pass.trackPh': 'Не выбрано',
     'pass.stamp': 'Принято',
-    'meta.title': 'M.ACADEMY • Онлайн-школа — Beyond Learning. Beyond Limits.',
     'meta.desc':
       'M.ACADEMY — современная экосистема онлайн-образования: 16 направлений по иностранным языкам, точным и общественным наукам.',
     'nav.about': 'Академия',
@@ -172,6 +356,28 @@ const dict = {
   },
 
   en: {
+    'title.home': 'M.ACADEMY • Online School — Beyond Learning. Beyond Limits.',
+    'title.news': 'News — M.ACADEMY',
+    'title.notFound': 'Page not found — M.ACADEMY',
+    'nav.news': 'News',
+    'news.eyebrow': 'News',
+    'news.title': 'Academy <em>news</em>',
+    'news.lead': 'Announcements, new courses and life at the academy.',
+    'news.latest': 'Latest <em>news</em>',
+    'news.allLink': 'All news',
+    'news.all': 'All',
+    'news.cat.announce': 'Announcement',
+    'news.cat.course': 'Courses',
+    'news.cat.event': 'Event',
+    'news.cat.tech': 'Technology',
+    'news.read': 'Read',
+    'news.minutes': 'min read',
+    'news.back': 'All news',
+    'news.more': 'More <em>news</em>',
+    'news.note': 'Sample posts — real news will be added later.',
+    'news.missing': 'This post could not be found.',
+    'notFound.title': 'Page <em>not found</em>',
+    'notFound.text': 'There is nothing at this address. Carry on from the home page.',
     'title.about': 'Academy — M.ACADEMY',
     'title.courses': 'Courses — M.ACADEMY',
     'title.results': 'Results — M.ACADEMY',
@@ -204,7 +410,6 @@ const dict = {
     'pass.namePh': 'Your name',
     'pass.trackPh': 'Not selected',
     'pass.stamp': 'Accepted',
-    'meta.title': 'M.ACADEMY • Online School — Beyond Learning. Beyond Limits.',
     'meta.desc':
       'M.ACADEMY is a modern online learning ecosystem: 16 tracks across foreign languages, exact and social sciences.',
     'nav.about': 'Academy',
@@ -318,78 +523,3 @@ const dict = {
     'form.submit': 'Send request',
   },
 };
-
-const LANGS = ['uz', 'ru', 'en'];
-const page = document.body?.dataset.page ?? 'home';
-const titleKey = page === 'home' ? 'meta.title' : `title.${page}`;
-const descKey = page === 'home' ? 'meta.desc' : `desc.${page}`;
-const STORAGE_KEY = 'ma-lang';
-const listeners = new Set();
-let current = 'uz';
-
-export function getLang() {
-  return current;
-}
-
-export function t(key) {
-  return dict[current]?.[key] ?? dict.uz[key] ?? key;
-}
-
-export function onLang(fn) {
-  listeners.add(fn);
-}
-
-function apply() {
-  document.documentElement.lang = current;
-  document.querySelectorAll('[data-i18n]').forEach((el) => {
-    const html = t(el.dataset.i18n);
-    if (el.innerHTML !== html) el.innerHTML = html;
-  });
-  document.title = t(titleKey);
-  document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute('content', dict[current]?.[descKey] ?? (current === 'uz' ? dict.uz[descKey] : t('meta.desc')));
-  document.querySelectorAll('[data-lang]').forEach((btn) => {
-    const active = btn.dataset.lang === current;
-    btn.classList.toggle('is-active', active);
-    btn.setAttribute('aria-pressed', String(active));
-  });
-}
-
-export function setLang(lang) {
-  if (!LANGS.includes(lang) || lang === current) return;
-  current = lang;
-  try {
-    localStorage.setItem(STORAGE_KEY, lang);
-  } catch {
-    /* private mode — language simply isn't remembered */
-  }
-  apply();
-  listeners.forEach((fn) => fn(lang));
-}
-
-export function initI18n() {
-  // Uzbek text is the markup itself: capture it once so we can switch back.
-  if (!(titleKey in dict.uz)) dict.uz[titleKey] = document.title;
-  if (!(descKey in dict.uz)) {
-    dict.uz[descKey] = document.querySelector('meta[name="description"]')?.getAttribute('content') ?? '';
-  }
-  document.querySelectorAll('[data-i18n]').forEach((el) => {
-    const key = el.dataset.i18n;
-    if (!(key in dict.uz)) dict.uz[key] = el.innerHTML.replace(/\s+/g, ' ').trim();
-  });
-
-  let saved = null;
-  try {
-    saved = localStorage.getItem(STORAGE_KEY);
-  } catch {
-    /* ignore */
-  }
-  if (saved && LANGS.includes(saved)) current = saved;
-  apply();
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-lang]');
-    if (btn) setLang(btn.dataset.lang);
-  });
-}
