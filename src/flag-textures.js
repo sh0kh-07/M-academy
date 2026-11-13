@@ -74,6 +74,9 @@ export function createUzbekistanFlag(anisotropy, size = 2048) {
   return { map: toTexture(canvas, { anisotropy }) };
 }
 
+/** Keep in sync with `uFill` in src/hero.js. */
+const EDGE_NAVY = '#0a1027';
+
 function goldGradient(ctx, x0, y0, x1, y1) {
   const g = ctx.createLinearGradient(x0, y0, x1, y1);
   g.addColorStop(0.0, '#8f6424');
@@ -124,19 +127,27 @@ export function createAcademyFlag(logoImage, anisotropy, size = 2048) {
   mctx.fillStyle = '#000';
   mctx.fillRect(0, 0, W, H);
 
-  const navy = ctx.createRadialGradient(W * 0.5, H * 0.5, 60, W * 0.5, H * 0.5, W * 0.62);
-  navy.addColorStop(0, '#17244f');
-  navy.addColorStop(0.55, '#0d1633');
-  navy.addColorStop(1, '#080d21');
-  ctx.fillStyle = navy;
+  // The field settles into one flat navy at every edge, so the cloth can carry on
+  // past the artwork without a visible border (the shader fills with the same colour).
+  ctx.fillStyle = EDGE_NAVY;
   ctx.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.translate(W / 2, H / 2);
+  ctx.scale(1, H / W);
+  const navy = ctx.createRadialGradient(0, 0, 0, 0, 0, W / 2);
+  navy.addColorStop(0, '#17244f');
+  navy.addColorStop(0.6, '#0e1736');
+  navy.addColorStop(1, EDGE_NAVY);
+  ctx.fillStyle = navy;
+  ctx.beginPath();
+  ctx.arc(0, 0, W / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 
   // gold corner bands
   const bands = [
     ['tl', H * 0.34, H * 0.085],
     ['tl', H * 0.455, H * 0.018],
-    ['br', H * 0.34, H * 0.085],
-    ['br', H * 0.455, H * 0.018],
   ];
   bands.forEach(([corner, o, t]) => {
     const span = (o + t) * 0.72;
@@ -145,15 +156,6 @@ export function createAcademyFlag(logoImage, anisotropy, size = 2048) {
     cornerBand(ctx, corner, W, H, o, t);
     mctx.fillStyle = '#fff';
     cornerBand(mctx, corner, W, H, o, t);
-  });
-
-  // thin gold hem
-  const hem = Math.round(H * 0.008);
-  [ctx, mctx].forEach((c) => {
-    c.fillStyle = c === ctx ? '#d8b062' : '#fff';
-    c.fillRect(0, 0, W, hem);
-    c.fillRect(0, H - hem, W, hem);
-    c.fillRect(W - hem, 0, hem, H);
   });
 
   // logo
