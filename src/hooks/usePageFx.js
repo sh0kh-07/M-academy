@@ -7,7 +7,9 @@ import { finePointer, reducedMotion } from '../lib/env.js';
   have to opt in with markup:
 
     data-reveal            fades / rises into view once (state kept in data-in)
-    className="tilt"       leans towards the pointer (state kept in data-tilting)
+    className="tilt"       leans towards the pointer (state kept in data-tilting);
+                           data-tilt="0.3" scales the lean, and --px / --py (−0.5 … 0.5)
+                           are set on it so inner layers can shift for depth
     className="magnetic"   is gently pulled by the pointer
 
   State lives in data-* attributes rather than classes on purpose: React owns
@@ -58,6 +60,8 @@ export function usePointerFx() {
       el.removeAttribute('data-tilting');
       el.style.setProperty('--rx', '0deg');
       el.style.setProperty('--ry', '0deg');
+      el.style.setProperty('--px', '0');
+      el.style.setProperty('--py', '0');
     };
     const applyTilt = () => {
       const e = pending;
@@ -67,8 +71,11 @@ export function usePointerFx() {
       const x = (e.clientX - r.left) / r.width;
       const y = (e.clientY - r.top) / r.height;
       tilted.setAttribute('data-tilting', '');
-      tilted.style.setProperty('--rx', `${(0.5 - y) * 9}deg`);
-      tilted.style.setProperty('--ry', `${(x - 0.5) * 11}deg`);
+      const strength = Number(tilted.dataset.tilt) || 1;
+      tilted.style.setProperty('--rx', `${(0.5 - y) * 9 * strength}deg`);
+      tilted.style.setProperty('--ry', `${(x - 0.5) * 11 * strength}deg`);
+      tilted.style.setProperty('--px', (x - 0.5).toFixed(3));
+      tilted.style.setProperty('--py', (y - 0.5).toFixed(3));
       tilted.style.setProperty('--mx', `${x * 100}%`);
       tilted.style.setProperty('--my', `${y * 100}%`);
     };

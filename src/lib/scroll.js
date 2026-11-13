@@ -38,8 +38,19 @@ export function unlockScroll() {
 }
 
 export function scrollToTop({ immediate = false } = {}) {
-  if (lenis) lenis.scrollTo(0, { immediate, force: true, duration: 1.4 });
-  else window.scrollTo({ top: 0, behavior: immediate || reducedMotion ? 'instant' : 'smooth' });
+  if (!lenis) {
+    window.scrollTo({ top: 0, behavior: immediate || reducedMotion ? 'instant' : 'smooth' });
+    return;
+  }
+  if (!immediate) {
+    lenis.scrollTo(0, { force: true, duration: 1.4 });
+    return;
+  }
+  // Jump natively, then make Lenis adopt the new position. Asking Lenis to do the jump
+  // is not reliable: it does nothing when its internal target already reads 0, and that
+  // value can be stale after scrolling that did not go through Lenis.
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  lenis.reset();
 }
 
 export function scrollToElement(el) {

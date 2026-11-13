@@ -3,17 +3,15 @@ import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { useI18n } from '../i18n/index.jsx';
 import { usePage } from '../components/Layout.jsx';
-import { CourseGrid, Cta, Eyebrow, Features, Stats } from '../components/Blocks.jsx';
-import { FlagBackdrop } from '../components/Scenes.jsx';
+import { CourseRing, Cta, Eyebrow, Features, Stats } from '../components/Blocks.jsx';
+import { FlagBackdrop, LanguageGlobe } from '../components/Scenes.jsx';
 import { PostCard } from '../components/NewsParts.jsx';
 import Icon from '../components/Icon.jsx';
 import { COURSES } from '../data/courses.js';
+import { PLACES } from '../data/places.js';
 import { POSTS } from '../data/news.js';
 import { reducedMotion, wait } from '../lib/env.js';
 import { lockScroll, scrollToElement, unlockScroll } from '../lib/scroll.js';
-
-/** Eight directions picked for the home page; the full list is on /courses. */
-const FEATURED = [0, 1, 2, 4, 9, 10, 13, 15];
 
 /** The logo preloader is shown once per browser session, on the first visit to the home page. */
 function firstVisit() {
@@ -280,7 +278,34 @@ export default function Home() {
               <Icon name="arrow" />
             </Link>
           </header>
-          <CourseGrid indices={FEATURED} />
+        </div>
+        <CourseRing />
+      </section>
+
+      {/* ============ WORLD LANGUAGES (3D globe) ============ */}
+      <section className="section world">
+        <div className="container world__grid">
+          <div className="world__copy">
+            <Eyebrow>{t('world.eyebrow')}</Eyebrow>
+            <h2 className="h2" data-reveal="" {...html('world.title')} />
+            <p className="lead" data-reveal="">
+              {t('world.text')}
+            </p>
+            <ul className="world__langs" data-reveal="">
+              {PLACES.map(({ course }) => (
+                <li key={course}>
+                  <Link to={`/register?course=${course}`}>
+                    <i>{COURSES[course].g}</i>
+                    {COURSES[course][lang]}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className="world__hint" data-reveal="">
+              {t('world.hint')}
+            </p>
+          </div>
+          <LanguageGlobe />
         </div>
       </section>
 

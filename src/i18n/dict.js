@@ -6,6 +6,11 @@
 
 export const dict = {
   uz: {
+    'world.eyebrow': 'Dunyo tillari',
+    'world.title': 'To‘qqiz til — <em>bitta maktab</em>',
+    'world.text': 'O‘zbekistondan dunyoga: ingliz, koreys, yapon, xitoy va boshqa tillarni bitta platformada o‘rganing.',
+    'world.hint': 'Globusni aylantirib ko‘ring',
+    'ring.hint': 'Aylantirish uchun torting',
     'title.home': 'M.ACADEMY • Online School — Beyond Learning. Beyond Limits.',
     'title.about': 'Akademiya — M.ACADEMY',
     'title.courses': 'Kurslar — M.ACADEMY',
@@ -188,6 +193,11 @@ export const dict = {
     'notFound.text': 'Bu manzilda hech narsa yo‘q. Bosh sahifadan davom eting.',
   },
   ru: {
+    'world.eyebrow': 'Языки мира',
+    'world.title': 'Девять языков — <em>одна школа</em>',
+    'world.text': 'Из Узбекистана — в мир: английский, корейский, японский, китайский и другие языки на одной платформе.',
+    'world.hint': 'Глобус можно покрутить',
+    'ring.hint': 'Потяните, чтобы повернуть',
     'title.home': 'M.ACADEMY • Онлайн-школа — Beyond Learning. Beyond Limits.',
     'title.news': 'Новости — M.ACADEMY',
     'title.notFound': 'Страница не найдена — M.ACADEMY',
@@ -356,6 +366,11 @@ export const dict = {
   },
 
   en: {
+    'world.eyebrow': 'World languages',
+    'world.title': 'Nine languages — <em>one school</em>',
+    'world.text': 'From Uzbekistan to the world: English, Korean, Japanese, Chinese and more — on one platform.',
+    'world.hint': 'Drag the globe to turn it',
+    'ring.hint': 'Drag to turn',
     'title.home': 'M.ACADEMY • Online School — Beyond Learning. Beyond Limits.',
     'title.news': 'News — M.ACADEMY',
     'title.notFound': 'Page not found — M.ACADEMY',
