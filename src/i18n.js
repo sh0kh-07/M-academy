@@ -7,6 +7,13 @@
 const dict = {
   // strings that only exist in JS (not present in the markup)
   uz: {
+    // used from JS on pages where the same words are not in the markup
+    'courses.lang': 'Tillar',
+    'courses.exact': 'Aniq fanlar',
+    'courses.social': 'Ijtimoiy fanlar',
+    'reg.undecided': 'Hali tanlamadim',
+    'pass.namePh': 'Ismingiz',
+    'pass.trackPh': 'Tanlanmagan',
     'meta.title': 'M.ACADEMY • Online School — Beyond Learning. Beyond Limits.',
     'meta.desc':
       'M.ACADEMY — zamonaviy onlayn ta’lim ekotizimi: xorijiy tillar, aniq va ijtimoiy fanlar bo‘yicha 16 ta yo‘nalish.',
@@ -15,19 +22,47 @@ const dict = {
       'Present Perfect o‘tmishda bo‘lib, natijasi hozir muhim bo‘lgan ish-harakatlar uchun ishlatiladi. Masalan: “I have finished my homework.”',
     'chat.q2': 'Yana bitta misol bering',
     'chat.a2': '“She has visited Samarkand twice.” — u Samarqandda ikki marta bo‘lgan, va bu tajriba hozir ham ahamiyatli.',
-    'form.any': 'Hali tanlamadim',
-    'course.enroll': 'Yozilish',
   },
 
   ru: {
+    'title.about': 'Академия — M.ACADEMY',
+    'title.courses': 'Курсы — M.ACADEMY',
+    'title.results': 'Результаты — M.ACADEMY',
+    'title.nigina': 'NIGINA — M.ACADEMY',
+    'title.register': 'Регистрация — M.ACADEMY',
+    'nav.home': 'Главная',
+    'common.more': 'Подробнее',
+    'courses.allLink': 'Все курсы',
+    'results.lead': 'Достижения учеников — наша главная гордость.',
+    'reg.eyebrow': 'Регистрация',
+    'reg.title': 'Ваше будущее <em>начинается</em> здесь',
+    'reg.lead': 'Три шага — и вы ученик M.ACADEMY.',
+    'reg.s1': 'Направление',
+    'reg.s2': 'Данные',
+    'reg.s3': 'Готово',
+    'reg.q1': 'Какое направление вам интересно?',
+    'reg.hint1': 'Его можно изменить позже',
+    'reg.undecided': 'Пока не выбрал(а)',
+    'reg.next': 'Продолжить',
+    'reg.back': 'Назад',
+    'reg.q2': 'Немного о вас',
+    'reg.note': 'Ваши данные используются только для связи с вами.',
+    'reg.doneTitle': 'Заявка принята',
+    'reg.doneText': 'Мы скоро свяжемся с вами.',
+    'reg.home': 'На главную',
+    'pass.kind': 'Заявка ученика',
+    'pass.name': 'Имя',
+    'pass.track': 'Направление',
+    'pass.date': 'Дата',
+    'pass.namePh': 'Ваше имя',
+    'pass.trackPh': 'Не выбрано',
+    'pass.stamp': 'Принято',
     'meta.title': 'M.ACADEMY • Онлайн-школа — Beyond Learning. Beyond Limits.',
     'meta.desc':
       'M.ACADEMY — современная экосистема онлайн-образования: 16 направлений по иностранным языкам, точным и общественным наукам.',
     'nav.about': 'Академия',
     'nav.courses': 'Курсы',
-    'nav.mentors': 'Наставники',
     'nav.results': 'Результаты',
-    'nav.contact': 'Контакты',
     'cta.signup': 'Записаться',
     'hero.sub': 'Создавайте своё будущее с новыми знаниями.',
     'hero.cta1': 'Смотреть курсы',
@@ -35,7 +70,6 @@ const dict = {
     'hero.tag1': 'Языки',
     'hero.tag2': 'Точные науки',
     'hero.tag3': 'Общественные науки',
-    'hero.scroll': 'Листайте вниз',
     'about.eyebrow': 'Академия',
     'about.title': 'Современная <em>экосистема</em> онлайн-образования',
     'about.text':
@@ -126,35 +160,56 @@ const dict = {
     'cta.eyebrow': 'Время начать',
     'cta.title': 'Начните своё образовательное путешествие <em>сегодня</em>.',
     'cta.sub': 'Сделайте первый шаг — а дальше мы рядом.',
-    'cta.contact': 'Связаться',
     'footer.tagline': 'Цифровая школа, где встречаются знания, технологии и вдохновение.',
     'footer.nav': 'Разделы',
     'footer.social': 'Соцсети',
     'footer.rights': 'Все права защищены.',
     'footer.top': 'Наверх ↑',
-    'form.title': 'Запись на обучение',
-    'form.sub': 'Оставьте контакты — мы свяжемся с вами.',
     'form.name': 'Ваше имя',
     'form.phone': 'Номер телефона',
-    'form.course': 'Направление',
-    'form.any': 'Пока не выбрал(а)',
     'form.error': 'Пожалуйста, укажите имя и корректный номер телефона.',
     'form.submit': 'Отправить заявку',
-    'form.doneTitle': 'Спасибо!',
-    'form.doneText': 'Заявка принята. Мы скоро свяжемся с вами.',
-    'form.close': 'Закрыть',
-    'course.enroll': 'Записаться',
   },
 
   en: {
+    'title.about': 'Academy — M.ACADEMY',
+    'title.courses': 'Courses — M.ACADEMY',
+    'title.results': 'Results — M.ACADEMY',
+    'title.nigina': 'NIGINA — M.ACADEMY',
+    'title.register': 'Sign up — M.ACADEMY',
+    'nav.home': 'Home',
+    'common.more': 'Learn more',
+    'courses.allLink': 'All courses',
+    'results.lead': 'Our students’ achievements are our greatest pride.',
+    'reg.eyebrow': 'Registration',
+    'reg.title': 'Your future <em>starts</em> here',
+    'reg.lead': 'Three steps — and you’re an M.ACADEMY student.',
+    'reg.s1': 'Track',
+    'reg.s2': 'Details',
+    'reg.s3': 'Done',
+    'reg.q1': 'Which track interests you?',
+    'reg.hint1': 'You can change it later',
+    'reg.undecided': 'Not decided yet',
+    'reg.next': 'Continue',
+    'reg.back': 'Back',
+    'reg.q2': 'A little about you',
+    'reg.note': 'Your details are used only to contact you.',
+    'reg.doneTitle': 'Request received',
+    'reg.doneText': 'We’ll be in touch soon.',
+    'reg.home': 'Back to home',
+    'pass.kind': 'Student application',
+    'pass.name': 'Name',
+    'pass.track': 'Track',
+    'pass.date': 'Date',
+    'pass.namePh': 'Your name',
+    'pass.trackPh': 'Not selected',
+    'pass.stamp': 'Accepted',
     'meta.title': 'M.ACADEMY • Online School — Beyond Learning. Beyond Limits.',
     'meta.desc':
       'M.ACADEMY is a modern online learning ecosystem: 16 tracks across foreign languages, exact and social sciences.',
     'nav.about': 'Academy',
     'nav.courses': 'Courses',
-    'nav.mentors': 'Mentors',
     'nav.results': 'Results',
-    'nav.contact': 'Contact',
     'cta.signup': 'Sign up',
     'hero.sub': 'Shape your future with new knowledge.',
     'hero.cta1': 'Explore courses',
@@ -162,7 +217,6 @@ const dict = {
     'hero.tag1': 'Languages',
     'hero.tag2': 'Exact sciences',
     'hero.tag3': 'Social sciences',
-    'hero.scroll': 'Scroll down',
     'about.eyebrow': 'Academy',
     'about.title': 'A modern online learning <em>ecosystem</em>',
     'about.text':
@@ -253,28 +307,22 @@ const dict = {
     'cta.eyebrow': 'Time to start',
     'cta.title': 'Start your learning journey <em>today</em>.',
     'cta.sub': 'Take the first step — we’ll be with you the rest of the way.',
-    'cta.contact': 'Contact us',
     'footer.tagline': 'A digital school where knowledge, technology and inspiration meet.',
     'footer.nav': 'Sections',
     'footer.social': 'Social',
     'footer.rights': 'All rights reserved.',
     'footer.top': 'Back to top ↑',
-    'form.title': 'Sign up',
-    'form.sub': 'Leave your details and we’ll get in touch.',
     'form.name': 'Your name',
     'form.phone': 'Phone number',
-    'form.course': 'Track',
-    'form.any': 'Not decided yet',
     'form.error': 'Please enter your name and a valid phone number.',
     'form.submit': 'Send request',
-    'form.doneTitle': 'Thank you!',
-    'form.doneText': 'Your request has been received. We’ll be in touch soon.',
-    'form.close': 'Close',
-    'course.enroll': 'Enrol',
   },
 };
 
 const LANGS = ['uz', 'ru', 'en'];
+const page = document.body?.dataset.page ?? 'home';
+const titleKey = page === 'home' ? 'meta.title' : `title.${page}`;
+const descKey = page === 'home' ? 'meta.desc' : `desc.${page}`;
 const STORAGE_KEY = 'ma-lang';
 const listeners = new Set();
 let current = 'uz';
@@ -297,8 +345,10 @@ function apply() {
     const html = t(el.dataset.i18n);
     if (el.innerHTML !== html) el.innerHTML = html;
   });
-  document.title = t('meta.title');
-  document.querySelector('meta[name="description"]')?.setAttribute('content', t('meta.desc'));
+  document.title = t(titleKey);
+  document
+    .querySelector('meta[name="description"]')
+    ?.setAttribute('content', dict[current]?.[descKey] ?? (current === 'uz' ? dict.uz[descKey] : t('meta.desc')));
   document.querySelectorAll('[data-lang]').forEach((btn) => {
     const active = btn.dataset.lang === current;
     btn.classList.toggle('is-active', active);
@@ -320,6 +370,10 @@ export function setLang(lang) {
 
 export function initI18n() {
   // Uzbek text is the markup itself: capture it once so we can switch back.
+  if (!(titleKey in dict.uz)) dict.uz[titleKey] = document.title;
+  if (!(descKey in dict.uz)) {
+    dict.uz[descKey] = document.querySelector('meta[name="description"]')?.getAttribute('content') ?? '';
+  }
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const key = el.dataset.i18n;
     if (!(key in dict.uz)) dict.uz[key] = el.innerHTML.replace(/\s+/g, ' ').trim();

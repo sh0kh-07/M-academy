@@ -1,0 +1,52 @@
+<!-- page-to-page transition: everything dips to black, like a cut in a film -->
+<div class="curtain" id="curtain" aria-hidden="true"></div>
+<div class="scroll-progress" aria-hidden="true"><span id="scroll-progress"></span></div>
+
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="brand" href="index.html" aria-label="M.ACADEMY">
+      <img src="/img/logo-mark.webp" alt="" width="543" height="531" />
+      <span class="brand__text"><b>M.ACADEMY</b><small>ONLINE SCHOOL</small></span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a href="index.html" data-nav="home" data-i18n="nav.home">Bosh sahifa</a>
+      <a href="about.html" data-nav="about" data-i18n="nav.about">Akademiya</a>
+      <a href="courses.html" data-nav="courses" data-i18n="nav.courses">Kurslar</a>
+      <a href="results.html" data-nav="results" data-i18n="nav.results">Natijalar</a>
+      <a href="nigina.html" data-nav="nigina">NIGINA</a>
+    </nav>
+
+    <div class="nav__side">
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="uz" class="is-active">UZ</button>
+        <button type="button" data-lang="ru">RU</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+      <a class="btn btn--gold btn--sm nav__cta" href="register.html" data-nav="register" data-i18n="cta.signup"
+        >Ro‘yxatdan o‘tish</a
+      >
+      <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="menu" id="menu" aria-hidden="true">
+  <nav class="menu__links">
+    <a href="index.html" data-nav="home"><i>01</i><span data-i18n="nav.home">Bosh sahifa</span></a>
+    <a href="about.html" data-nav="about"><i>02</i><span data-i18n="nav.about">Akademiya</span></a>
+    <a href="courses.html" data-nav="courses"><i>03</i><span data-i18n="nav.courses">Kurslar</span></a>
+    <a href="results.html" data-nav="results"><i>04</i><span data-i18n="nav.results">Natijalar</span></a>
+    <a href="nigina.html" data-nav="nigina"><i>05</i><span>NIGINA</span></a>
+  </nav>
+  <div class="menu__foot">
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="uz" class="is-active">UZ</button>
+      <button type="button" data-lang="ru">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a class="btn btn--gold" href="register.html" data-i18n="cta.signup">Ro‘yxatdan o‘tish</a>
+  </div>
+</div>

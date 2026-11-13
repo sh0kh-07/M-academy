@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <!-- @include head.html -->
+    <title>Ro‘yxatdan o‘tish — M.ACADEMY</title>
+    <meta name="description" content="M.ACADEMY’da o‘qishni boshlang: yo‘nalishni tanlang va ariza qoldiring." />
+  </head>
+
+  <body class="is-entering" data-page="register" id="top">
+    <!-- @include chrome.html -->
+
+    <main class="reg" id="register">
+      <canvas class="reg__canvas" id="reg-canvas" aria-hidden="true"></canvas>
+      <div class="reg__shade" aria-hidden="true"></div>
+
+      <div class="container reg__grid">
+        <!-- ============ LEFT: headline + live pass ============ -->
+        <div class="reg__intro">
+          <p class="eyebrow reg__in"><span class="eyebrow__line"></span><span data-i18n="reg.eyebrow">Ro‘yxatdan o‘tish</span></p>
+          <h1 class="h1 reg__title reg__in" data-i18n="reg.title">Kelajagingiz shu yerdan <em>boshlanadi</em></h1>
+          <p class="lead reg__in" data-i18n="reg.lead">Uch qadam — va siz M.ACADEMY o‘quvchisisiz.</p>
+
+          <!-- fills in live while the form is being completed -->
+          <div class="pass-wrap reg__in">
+            <article class="pass" id="pass" aria-hidden="true">
+              <div class="pass__face">
+                <header class="pass__head">
+                  <img src="/img/logo-mark.webp" alt="" width="543" height="531" />
+                  <span class="pass__brand"><b>M.ACADEMY</b><small>ONLINE SCHOOL</small></span>
+                  <em data-i18n="pass.kind">Talaba arizasi</em>
+                </header>
+
+                <div class="pass__body">
+                  <dl class="pass__rows">
+                    <div>
+                      <dt data-i18n="pass.name">Ism</dt>
+                      <dd id="pass-name" class="is-empty"></dd>
+                    </div>
+                    <div>
+                      <dt data-i18n="pass.track">Yo‘nalish</dt>
+                      <dd id="pass-track" class="is-empty"></dd>
+                    </div>
+                  </dl>
+                  <div class="pass__glyph" id="pass-glyph">M</div>
+                </div>
+
+                <footer class="pass__foot">
+                  <span><small data-i18n="pass.date">Sana</small><b id="pass-date"></b></span>
+                  <span><small>№</small><b id="pass-id"></b></span>
+                  <span class="pass__motto">BEYOND LEARNING.<br />BEYOND LIMITS.</span>
+                </footer>
+
+                <span class="pass__stamp" id="pass-stamp" data-i18n="pass.stamp">Qabul qilindi</span>
+                <span class="pass__shine" aria-hidden="true"></span>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- ============ RIGHT: three-step form ============ -->
+        <form class="reg__card reg__in" id="reg-form" novalidate>
+          <span class="reg__glow" aria-hidden="true"></span>
+
+          <div class="stepper" id="stepper">
+            <div class="stepper__line"><b id="stepper-fill"></b></div>
+            <ol>
+              <li class="is-active"><i>01</i><span data-i18n="reg.s1">Yo‘nalish</span></li>
+              <li><i>02</i><span data-i18n="reg.s2">Ma’lumot</span></li>
+              <li><i>03</i><span data-i18n="reg.s3">Tayyor</span></li>
+            </ol>
+          </div>
+
+          <div class="reg__panes">
+            <!-- step 1 -->
+            <section class="pane is-active" data-step="1">
+              <h2 class="pane__title" data-i18n="reg.q1">Qaysi yo‘nalish sizni qiziqtiradi?</h2>
+              <div class="choices" id="choices"></div>
+              <div class="reg__actions">
+                <span class="reg__hint" data-i18n="reg.hint1">Keyinroq o‘zgartirish mumkin</span>
+                <button type="button" class="btn btn--gold" data-next>
+                  <span data-i18n="reg.next">Davom etish</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- step 2 -->
+            <section class="pane" data-step="2" hidden>
+              <h2 class="pane__title" data-i18n="reg.q2">O‘zingiz haqingizda</h2>
+              <label class="field">
+                <input type="text" name="name" autocomplete="name" placeholder=" " required minlength="2" />
+                <span data-i18n="form.name">Ismingiz</span>
+                <i></i>
+              </label>
+              <label class="field">
+                <input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder=" " required />
+                <span data-i18n="form.phone">Telefon raqamingiz</span>
+                <i></i>
+              </label>
+              <p class="reg__error" id="reg-error" role="alert" hidden data-i18n="form.error">
+                Iltimos, ism va telefon raqamini to‘g‘ri kiriting.
+              </p>
+              <p class="reg__note" data-i18n="reg.note">Ma’lumotlaringiz faqat siz bilan bog‘lanish uchun ishlatiladi.</p>
+              <div class="reg__actions">
+                <button type="button" class="btn btn--ghost" data-back data-i18n="reg.back">Orqaga</button>
+                <button type="submit" class="btn btn--gold">
+                  <span data-i18n="form.submit">Ariza yuborish</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- step 3 -->
+            <section class="pane pane--done" data-step="3" hidden>
+              <svg class="reg__check" viewBox="0 0 64 64" aria-hidden="true">
+                <circle cx="32" cy="32" r="28" />
+                <path d="m20 33 9 9 16-18" />
+              </svg>
+              <h2 class="pane__title" data-i18n="reg.doneTitle">Arizangiz qabul qilindi</h2>
+              <p class="pane__text" data-i18n="reg.doneText">Tez orada siz bilan bog‘lanamiz.</p>
+              <div class="reg__actions reg__actions--center">
+                <a class="btn btn--ghost" href="index.html" data-i18n="reg.home">Bosh sahifaga</a>
+                <a class="btn btn--gold" href="courses.html" data-i18n="hero.cta1">Kurslarni ko‘rish</a>
+              </div>
+            </section>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- @include footer.html -->
+  </body>
+</html>

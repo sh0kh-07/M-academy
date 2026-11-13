@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 /* ------------------------------------------------------------------
    Flag artwork is painted on <canvas> at runtime and used as textures.
+   Both flags are 2 : 1, so they read as equals when shown together.
    ------------------------------------------------------------------ */
 
 const UZ = { blue: '#0099b5', white: '#ffffff', green: '#1eb53a', red: '#ce1126' };
@@ -33,9 +34,9 @@ function toTexture(canvas, { srgb = true, anisotropy = 8 } = {}) {
  * blue / white / green bands of 40, red fimbriations of 2.5,
  * crescent Ø30 placed 20 from the hoist, twelve Ø6 stars in rows of 3-4-5.
  */
-export function createUzbekistanFlag(anisotropy) {
-  const W = 2048;
-  const H = 1024;
+export function createUzbekistanFlag(anisotropy, size = 2048) {
+  const W = size;
+  const H = size / 2;
   const s = H / 125;
   const canvas = document.createElement('canvas');
   canvas.width = W;
@@ -70,7 +71,7 @@ export function createUzbekistanFlag(anisotropy) {
     cols.slice(5 - count).forEach((x) => star(ctx, x * s, y * s, 3 * s));
   });
 
-  return { map: toTexture(canvas, { anisotropy }), aspect: W / H };
+  return { map: toTexture(canvas, { anisotropy }) };
 }
 
 function goldGradient(ctx, x0, y0, x1, y1) {
@@ -84,144 +85,99 @@ function goldGradient(ctx, x0, y0, x1, y1) {
   return g;
 }
 
-/** Diagonal corner band (45°) expressed as a polygon; `o` = offset, `t` = thickness. */
-function cornerBand(ctx, corner, rect, o, t) {
-  const { x, y, w, h } = rect;
+/** Diagonal corner band (45°): `o` = offset from the corner, `t` = thickness. */
+function cornerBand(ctx, corner, W, H, o, t) {
   ctx.beginPath();
   if (corner === 'tl') {
-    ctx.moveTo(x, y + o);
-    ctx.lineTo(x + o, y);
-    ctx.lineTo(x + o + t, y);
-    ctx.lineTo(x, y + o + t);
+    ctx.moveTo(0, o);
+    ctx.lineTo(o, 0);
+    ctx.lineTo(o + t, 0);
+    ctx.lineTo(0, o + t);
   } else {
-    ctx.moveTo(x + w, y + h - o);
-    ctx.lineTo(x + w - o, y + h);
-    ctx.lineTo(x + w - o - t, y + h);
-    ctx.lineTo(x + w, y + h - o - t);
+    ctx.moveTo(W, H - o);
+    ctx.lineTo(W - o, H);
+    ctx.lineTo(W - o - t, H);
+    ctx.lineTo(W, H - o - t);
   }
   ctx.closePath();
   ctx.fill();
 }
 
 /**
- * M Academy flag: navy satin, gold corner bands, gold logo, gold fringe on the three free edges.
- * Returns colour map (with alpha for the fringe) and a roughness/metalness map so the
- * gold parts catch the light like metallic thread.
+ * M Academy flag: navy silk, restrained gold corner bands, gold logo in the centre.
+ * `mask` is white wherever the artwork is gold — the shader lights those parts as metal thread.
  */
-export function createAcademyFlag(logoImage, anisotropy) {
-  const W = 2048;
-  const H = 1366;
-  const F = 44; // fringe length in px
-  const cloth = { x: 0, y: F, w: W - F, h: H - F * 2 };
+export function createAcademyFlag(logoImage, anisotropy, size = 2048) {
+  const W = size;
+  const H = size / 2;
 
   const canvas = document.createElement('canvas');
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  const pbr = document.createElement('canvas');
-  pbr.width = W;
-  pbr.height = H;
-  const pctx = pbr.getContext('2d');
-  const CLOTH_PBR = 'rgb(0,150,0)'; // G = roughness .59, B = metalness 0
-  const GOLD_PBR = 'rgb(0,84,225)'; // G = roughness .33, B = metalness .88
+  const maskCanvas = document.createElement('canvas');
+  maskCanvas.width = W / 2;
+  maskCanvas.height = H / 2;
+  const mctx = maskCanvas.getContext('2d');
+  mctx.scale(0.5, 0.5);
+  mctx.fillStyle = '#000';
+  mctx.fillRect(0, 0, W, H);
 
-  // --- fringe strands -------------------------------------------------
-  const strand = (c, color, px, py, w, h) => {
-    c.fillStyle = color;
-    c.fillRect(px, py, w, h);
-  };
-  const tones = ['#e7c172', '#c99a48', '#f3d999', '#b88a3c', '#dcb362'];
-  let i = 0;
-  for (let x = 2; x < cloth.w; x += 11) {
-    const tone = tones[i++ % tones.length];
-    const len = F - ((i * 7) % 9);
-    strand(ctx, tone, x, cloth.y + cloth.h - 2, 7, len);
-    strand(ctx, tone, x, cloth.y - len + 2, 7, len);
-    strand(pctx, GOLD_PBR, x, cloth.y + cloth.h - 2, 7, len);
-    strand(pctx, GOLD_PBR, x, cloth.y - len + 2, 7, len);
-  }
-  for (let y = cloth.y + 2; y < cloth.y + cloth.h; y += 11) {
-    const tone = tones[i++ % tones.length];
-    const len = F - ((i * 5) % 9);
-    strand(ctx, tone, cloth.x + cloth.w - 2, y, len, 7);
-    strand(pctx, GOLD_PBR, cloth.x + cloth.w - 2, y, len, 7);
-  }
-
-  // --- cloth ----------------------------------------------------------
-  const navy = ctx.createRadialGradient(cloth.w * 0.5, H * 0.5, 80, cloth.w * 0.5, H * 0.5, cloth.w * 0.75);
-  navy.addColorStop(0, '#16224d');
+  const navy = ctx.createRadialGradient(W * 0.5, H * 0.5, 60, W * 0.5, H * 0.5, W * 0.62);
+  navy.addColorStop(0, '#17244f');
   navy.addColorStop(0.55, '#0d1633');
   navy.addColorStop(1, '#080d21');
   ctx.fillStyle = navy;
-  ctx.fillRect(cloth.x, cloth.y, cloth.w, cloth.h);
-  pctx.fillStyle = CLOTH_PBR;
-  pctx.fillRect(cloth.x, cloth.y, cloth.w, cloth.h);
+  ctx.fillRect(0, 0, W, H);
 
-  // --- gold corner bands ----------------------------------------------
+  // gold corner bands
   const bands = [
-    ['tl', cloth.h * 0.36, cloth.h * 0.105],
-    ['tl', cloth.h * 0.5, cloth.h * 0.022],
-    ['br', cloth.h * 0.36, cloth.h * 0.105],
-    ['br', cloth.h * 0.5, cloth.h * 0.022],
+    ['tl', H * 0.34, H * 0.085],
+    ['tl', H * 0.455, H * 0.018],
+    ['br', H * 0.34, H * 0.085],
+    ['br', H * 0.455, H * 0.018],
   ];
-  [ctx, pctx].forEach((c) => {
-    c.save();
-    c.beginPath();
-    c.rect(cloth.x, cloth.y, cloth.w, cloth.h);
-    c.clip();
-    bands.forEach(([corner, o, t]) => {
-      if (c === ctx) {
-        c.fillStyle =
-          corner === 'tl'
-            ? goldGradient(c, cloth.x, cloth.y, cloth.x + (o + t) * 0.72, cloth.y + (o + t) * 0.72)
-            : goldGradient(
-                c,
-                cloth.x + cloth.w - (o + t) * 0.72,
-                cloth.y + cloth.h - (o + t) * 0.72,
-                cloth.x + cloth.w,
-                cloth.y + cloth.h,
-              );
-      } else {
-        c.fillStyle = GOLD_PBR;
-      }
-      cornerBand(c, corner, cloth, o, t);
-    });
-    c.restore();
+  bands.forEach(([corner, o, t]) => {
+    const span = (o + t) * 0.72;
+    ctx.fillStyle =
+      corner === 'tl' ? goldGradient(ctx, 0, 0, span, span) : goldGradient(ctx, W - span, H - span, W, H);
+    cornerBand(ctx, corner, W, H, o, t);
+    mctx.fillStyle = '#fff';
+    cornerBand(mctx, corner, W, H, o, t);
   });
 
-  // gold hem along the edges
-  ctx.fillStyle = '#d8b062';
-  pctx.fillStyle = GOLD_PBR;
-  [ctx, pctx].forEach((c) => {
-    c.fillRect(cloth.x, cloth.y, cloth.w, 9);
-    c.fillRect(cloth.x, cloth.y + cloth.h - 9, cloth.w, 9);
-    c.fillRect(cloth.x + cloth.w - 9, cloth.y, 9, cloth.h);
+  // thin gold hem
+  const hem = Math.round(H * 0.008);
+  [ctx, mctx].forEach((c) => {
+    c.fillStyle = c === ctx ? '#d8b062' : '#fff';
+    c.fillRect(0, 0, W, hem);
+    c.fillRect(0, H - hem, W, hem);
+    c.fillRect(W - hem, 0, hem, H);
   });
 
-  // --- logo -----------------------------------------------------------
+  // logo
   if (logoImage) {
-    const lh = cloth.h * 0.6;
+    const lh = H * 0.5;
     const lw = lh * (logoImage.width / logoImage.height);
-    const lx = cloth.x + (cloth.w - lw) / 2;
-    const ly = cloth.y + (cloth.h - lh) / 2;
+    const lx = (W - lw) / 2;
+    const ly = (H - lh) / 2;
     ctx.drawImage(logoImage, lx, ly, lw, lh);
 
-    const mask = document.createElement('canvas');
-    mask.width = Math.ceil(lw);
-    mask.height = Math.ceil(lh);
-    const mctx = mask.getContext('2d');
-    mctx.drawImage(logoImage, 0, 0, mask.width, mask.height);
-    mctx.globalCompositeOperation = 'source-in';
-    mctx.fillStyle = GOLD_PBR;
-    mctx.fillRect(0, 0, mask.width, mask.height);
-    pctx.drawImage(mask, lx, ly);
+    const stencil = document.createElement('canvas');
+    stencil.width = Math.ceil(lw);
+    stencil.height = Math.ceil(lh);
+    const sctx = stencil.getContext('2d');
+    sctx.drawImage(logoImage, 0, 0, stencil.width, stencil.height);
+    sctx.globalCompositeOperation = 'source-in';
+    sctx.fillStyle = '#fff';
+    sctx.fillRect(0, 0, stencil.width, stencil.height);
+    mctx.drawImage(stencil, lx, ly);
   }
 
   return {
     map: toTexture(canvas, { anisotropy }),
-    pbr: toTexture(pbr, { srgb: false, anisotropy }),
-    aspect: W / H,
+    mask: toTexture(maskCanvas, { srgb: false, anisotropy: 4 }),
   };
 }
 

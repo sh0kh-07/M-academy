@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <!-- @include head.html -->
+    <title>Kurslar — M.ACADEMY</title>
+    <meta
+      name="description"
+      content="M.ACADEMY kurslari: xorijiy tillar, aniq va ijtimoiy fanlar bo‘yicha 16 ta yo‘nalish."
+    />
+  </head>
+
+  <body class="is-entering" data-page="courses" id="top">
+    <!-- @include chrome.html -->
+
+    <main>
+      <!-- ============ PAGE HERO ============ -->
+      <section class="page-hero">
+        <div class="container">
+          <p class="eyebrow" data-reveal>
+            <span class="eyebrow__line"></span><span data-i18n="courses.eyebrow">Kurslar</span>
+          </p>
+          <h1 class="h1" data-reveal data-i18n="courses.title">Bilim olamiga <em>yo‘l oching</em></h1>
+          <p class="lead" data-reveal data-i18n="courses.sub">
+            Xorijiy tillardan tortib aniq va ijtimoiy fanlargacha — 16 ta yo‘nalish.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ ALL COURSES ============ -->
+      <section class="section section--tight courses">
+        <div class="container">
+          <div class="filters" id="filters" data-reveal role="tablist">
+            <button type="button" class="is-active" data-filter="all" data-i18n="courses.all">Barchasi</button>
+            <button type="button" data-filter="lang" data-i18n="courses.lang">Tillar</button>
+            <button type="button" data-filter="exact" data-i18n="courses.exact">Aniq fanlar</button>
+            <button type="button" data-filter="social" data-i18n="courses.social">Ijtimoiy fanlar</button>
+          </div>
+          <div class="courses__grid" id="courses-grid"></div>
+        </div>
+      </section>
+
+      <!-- ============ LEARNING PATH ============ -->
+      <section class="path" id="path">
+        <div class="path__pin">
+          <div class="container path__head">
+            <p class="eyebrow" data-reveal>
+              <span class="eyebrow__line"></span><span data-i18n="path.eyebrow">O‘quv yo‘li</span>
+            </p>
+            <h2 class="h2" data-reveal data-i18n="path.title">Boshlang‘ichdan <em>mutaxassisgacha</em></h2>
+          </div>
+          <div class="path__viewport">
+            <div class="path__track" id="path-track">
+              <div class="path__line"><span id="path-fill"></span></div>
+              <article class="step">
+                <span class="step__num">01</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.1.title">Boshlang‘ich</h3>
+                <p data-i18n="path.1.text">Daraja aniqlanadi, maqsadlar belgilanadi.</p>
+              </article>
+              <article class="step">
+                <span class="step__num">02</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.2.title">Asos</h3>
+                <p data-i18n="path.2.text">Mustahkam poydevor va to‘g‘ri odatlar.</p>
+              </article>
+              <article class="step">
+                <span class="step__num">03</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.3.title">O‘rta</h3>
+                <p data-i18n="path.3.text">Bilimlar amaliyot bilan mustahkamlanadi.</p>
+              </article>
+              <article class="step">
+                <span class="step__num">04</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.4.title">Yuqori</h3>
+                <p data-i18n="path.4.text">Murakkab mavzular va imtihonlarga tayyorgarlik.</p>
+              </article>
+              <article class="step">
+                <span class="step__num">05</span>
+                <i class="step__dot"></i>
+                <h3 data-i18n="path.5.title">Mutaxassis</h3>
+                <p data-i18n="path.5.text">Erkin qo‘llash va yangi cho‘qqilar.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- @include cta.html -->
+    </main>
+
+    <!-- @include footer.html -->
+  </body>
+</html>

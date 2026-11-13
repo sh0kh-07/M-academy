@@ -1,341 +1,334 @@
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import gsap from 'gsap';
 import { createUzbekistanFlag, createAcademyFlag, loadImage } from './flag-textures.js';
 
 /* ------------------------------------------------------------------
-   Cloth: a subdivided plane displaced in the vertex shader.
-   Normals are rebuilt from the displaced surface so the folds
-   catch real light (PBR material, sheen, metallic gold thread).
+   Cinematic flag backdrop.
+
+   Slow-motion silk, low-key light, and a sequence of shots that dip
+   to black between each other:
+     'uz'   — the flag of Uzbekistan
+     'ma'   — the M Academy flag
+     'both' — the two together, moving in sync
+   The page copy sits on top; this is deliberately a background.
+
+   One lightweight custom shader (no PBR, no environment map) and an
+   adaptive pixel ratio keep it cheap on integrated GPUs.
    ------------------------------------------------------------------ */
-const WAVE_GLSL = /* glsl */ `
+
+const FLAG_W = 3;
+const FLAG_H = 1.5;
+
+/** Seconds. One shot = fade in → hold → fade to black → short pause. */
+const TIMING = { fadeIn: 1.9, hold: 6.6, fadeOut: 1.4, black: 0.45 };
+const SHOT_LENGTH = TIMING.fadeIn + TIMING.hold + TIMING.fadeOut + TIMING.black;
+
+const VERT = /* glsl */ `
 uniform float uTime;
-uniform float uWind;
-uniform float uUnfurl;
-uniform float uSeed;
-uniform vec2 uFlag;
+varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vView;
 varying float vFold;
 
+const vec2 FLAG = vec2(${FLAG_W.toFixed(1)}, ${FLAG_H.toFixed(1)});
+
+// Origin is the top of the hoist: x runs along the fly, y runs down.
 vec3 flagPos(vec2 p) {
-  float u = clamp(p.x / uFlag.x, 0.0, 1.0);
-  float v = p.y / uFlag.y;
+  float u = clamp(p.x / FLAG.x, 0.0, 1.0);
+  float v = -p.y / FLAG.y;
   float t = uTime;
-  float ph = uSeed;
 
-  float amp = (0.22 + 0.78 * u) * u * uWind * 2.25;            // pinned at the hoist, free at the fly
-  float gust = 0.78 + 0.22 * sin(t * 0.7 + u * 2.5 + ph * 1.3);
+  float amp = mix(0.18, 1.0, u) * smoothstep(0.0, 0.09, u) * 1.8;
   float w =
-      0.185 * sin(u * 9.0  - t * 3.3  + v * 2.3 + ph)
-    + 0.095 * sin(u * 15.5 - t * 5.6  - v * 3.6 + ph * 1.7)
-    + 0.036 * sin(u * 26.0 - t * 8.8  + v * 6.0 + ph * 2.9)
-    + 0.230 * sin(u * 3.1  - t * 1.45 + v * 0.8 + ph * 0.6);
-  float edge = 0.06 * sin(v * 7.0 + t * 2.4 + u * 9.0 + ph) * abs(v) * 2.0;
+      0.170 * sin(u * 7.0  - t * 1.25 + v * 1.7)
+    + 0.085 * sin(u * 12.5 - t * 2.10 - v * 2.7 + 1.9)
+    + 0.028 * sin(u * 22.0 - t * 3.30 + v * 4.6 + 4.1)
+    + 0.150 * sin(u * 2.6  - t * 0.58 + v * 0.8 + 0.7);
+  float edge = 0.035 * sin(v * 6.5 + t * 0.9 + u * 8.0) * abs(v - 0.5) * 2.0;
 
-  float z = (w * gust + edge) * amp;
-  float sag = mix(0.5, 0.075, uUnfurl);
-  float y = p.y - sag * u * u * uFlag.y + 0.035 * sin(u * 8.0 - t * 3.6 + ph) * amp;
-  float x = p.x * (0.9 - 0.035 * uWind * u);
-
-  x *= mix(0.12, 1.0, uUnfurl);
-  z *= mix(0.4, 1.0, uUnfurl);
+  float z = (w + edge) * amp;
+  float y = p.y - 0.05 * u * u * FLAG.y + 0.022 * sin(u * 8.0 - t * 1.4) * amp;
+  float x = p.x * (0.94 - 0.03 * u);
   return vec3(x, y, z);
 }
-`;
 
-const NORMAL_GLSL = /* glsl */ `
-vec3 fp0 = flagPos(position.xy);
-vec3 fpx = flagPos(position.xy + vec2(0.02, 0.0));
-vec3 fpy = flagPos(position.xy + vec2(0.0, 0.02));
-vec3 objectNormal = normalize(cross(fpx - fp0, fpy - fp0));
-#ifdef USE_TANGENT
-  vec3 objectTangent = vec3(tangent.xyz);
-#endif
-`;
-
-function injectWave(material, uniforms) {
-  material.onBeforeCompile = (shader) => {
-    Object.assign(shader.uniforms, uniforms);
-    shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', `#include <common>\n${WAVE_GLSL}`)
-      .replace('#include <beginnormal_vertex>', NORMAL_GLSL)
-      .replace('#include <begin_vertex>', 'vec3 transformed = fp0;\nvFold = fp0.z;');
-    shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying float vFold;')
-      .replace(
-        '#include <color_fragment>',
-        '#include <color_fragment>\ndiffuseColor.rgb *= mix(0.58, 1.08, smoothstep(-0.62, 0.62, vFold));',
-      );
-  };
-  material.customProgramCacheKey = () => 'ma-flag-wave';
-}
-
-const DUST_VERT = /* glsl */ `
-attribute float aSize;
-attribute float aSeed;
-uniform float uTime;
-uniform float uPixelRatio;
-varying float vAlpha;
 void main() {
-  vec3 p = position;
-  p.y = mod(p.y + uTime * (0.10 + aSeed * 0.16) + 7.0, 14.0) - 7.0;
-  p.x += sin(uTime * 0.35 + aSeed * 31.0) * 0.35;
-  p.z += cos(uTime * 0.28 + aSeed * 17.0) * 0.35;
-  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  vec3 p0 = flagPos(position.xy);
+  vec3 px = flagPos(position.xy + vec2(0.02, 0.0));
+  vec3 py = flagPos(position.xy + vec2(0.0, 0.02));
+  vec3 n = normalize(cross(px - p0, py - p0));
+
+  vec4 mv = modelViewMatrix * vec4(p0, 1.0);
+  vNormal = normalize(normalMatrix * n);
+  vView = mv.xyz;
+  vUv = uv;
+  vFold = p0.z;
   gl_Position = projectionMatrix * mv;
-  gl_PointSize = aSize * uPixelRatio * (34.0 / -mv.z);
-  float tw = 0.5 + 0.5 * sin(uTime * (0.8 + aSeed * 2.2) + aSeed * 60.0);
-  vAlpha = (0.25 + 0.75 * tw) * smoothstep(7.0, 4.5, abs(p.y));
 }
 `;
 
-const DUST_FRAG = /* glsl */ `
-uniform vec3 uColor;
-varying float vAlpha;
+const FRAG = /* glsl */ `
+uniform sampler2D uMap;
+uniform sampler2D uMask;
+uniform float uHasMask;
+uniform float uExposure;
+uniform float uGain;
+uniform float uTime;
+uniform vec3 uLight;
+varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vView;
+varying float vFold;
+
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
 void main() {
-  float d = length(gl_PointCoord - 0.5);
-  float a = smoothstep(0.5, 0.0, d);
-  gl_FragColor = vec4(uColor, a * a * vAlpha);
+  vec3 base = texture2D(uMap, vUv).rgb;
+  float metal = uHasMask > 0.5 ? texture2D(uMask, vUv).r : 0.0;
+
+  vec3 n = normalize(vNormal);
+  if (!gl_FrontFacing) n = -n;
+  vec3 v = normalize(-vView);
+  vec3 l = normalize(uLight);
+  vec3 h = normalize(l + v);
+
+  float wrap = clamp((dot(n, l) + 0.28) / 1.28, 0.0, 1.0);
+  float diffuse = wrap * wrap;
+  float nh = max(dot(n, h), 0.0);
+  float fresnel = pow(1.0 - max(dot(n, v), 0.0), 3.0);
+  float fold = mix(0.34, 1.0, smoothstep(-0.55, 0.45, vFold));   // folds fall into shadow
+
+  // silk: soft raking light, a narrow satin highlight, a little sheen at grazing angles
+  vec3 silk = base * (0.07 + 1.2 * diffuse) * fold
+            + vec3(1.0, 0.96, 0.9) * pow(nh, 26.0) * 0.13
+            + base * fresnel * 0.2;
+
+  // gold thread: darker in shadow, bright where it catches the key light
+  vec3 gold = base * (0.10 + 0.7 * diffuse + 1.6 * pow(nh, 12.0)) * fold
+            + vec3(1.0, 0.9, 0.7) * pow(nh, 64.0) * 0.55;
+
+  vec3 col = mix(silk, gold, metal);
+
+  // grade: slightly desaturated, cool shadows
+  float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  col = mix(vec3(luma), col, 0.84);
+  col = mix(col * vec3(0.9, 0.96, 1.08), col, smoothstep(0.0, 0.35, luma));
+
+  col *= uExposure * uGain;
+  col += (hash(gl_FragCoord.xy + fract(uTime) * 71.3) - 0.5) * 0.016 * uExposure;   // film grain
+
+  gl_FragColor = vec4(col, 1.0);
+  #include <colorspace_fragment>
 }
 `;
 
-const lerp = THREE.MathUtils.lerp;
 const clamp = THREE.MathUtils.clamp;
+const smooth = (x) => {
+  const t = clamp(x, 0, 1);
+  return t * t * (3 - 2 * t);
+};
 
-export async function createHero(canvas, { reducedMotion = false } = {}) {
+/**
+ * Where each flag sits for every shot, as fractions of the visible frame:
+ * x / y = top-left corner of the flag, h = flag height (flags are 2 : 1).
+ */
+const LAYOUTS = {
+  hero(shot, aspect) {
+    if (aspect > 1) {
+      if (shot === 'uz') return { uz: { x: -0.015, y: 0.035, h: 1.04 } };
+      if (shot === 'ma') {
+        const h = clamp(0.72 * aspect, 1.1, 1.38); // logo (flag centre) lands at ~70 % of the width
+        return { ma: { x: 0.7 - h / aspect, y: 0.52 - h / 2, h } };
+      }
+      const h = Math.min(0.3 * aspect, 0.5);
+      const w = (2 * h) / aspect;
+      return { uz: { x: 0.02, y: 0.075, h }, ma: { x: 1.02 - w, y: 0.075 + h * 0.8, h } };
+    }
+    // portrait: flags live in the upper half, the copy sits below
+    if (shot === 'both') {
+      const h = Math.min(0.47 * aspect, 0.215);
+      const x = 0.5 - h / aspect;
+      return { uz: { x, y: 0.1, h }, ma: { x, y: 0.12 + h, h } };
+    }
+    const h = Math.min(0.95 * aspect, 0.46);
+    const y = 0.095 + (0.46 - h) / 2;
+    return shot === 'uz' ? { uz: { x: -0.02, y, h } } : { ma: { x: 0.5 - h / aspect, y, h } };
+  },
+
+  // Sign-up page: a close crop of navy silk and the gold corner band, logo out of frame.
+  register(shot, aspect) {
+    const h = Math.max(1.6 * aspect, 1.3);
+    return { ma: { x: -0.05, y: -0.07, h } };
+  },
+};
+
+export async function createHero(
+  canvas,
+  { reducedMotion = false, shots = ['uz', 'ma', 'both'], layout = 'hero', brightness = 1 } = {},
+) {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
-    alpha: true,
+    alpha: false,
     powerPreference: 'high-performance',
   });
-  const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-  renderer.setPixelRatio(pixelRatio);
+  renderer.setClearColor(0x03040a, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.NeutralToneMapping;
-  renderer.toneMappingExposure = 1.08;
+
+  // A soft, dim backdrop does not need retina resolution.
+  const MAX_RATIO = Math.min(window.devicePixelRatio || 1, 1.5);
+  let pixelRatio = MAX_RATIO;
+  renderer.setPixelRatio(pixelRatio);
 
   const scene = new THREE.Scene();
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.38;
-  pmrem.dispose();
+  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 60);
+  const CAM_Z = 12;
+  camera.position.set(0, 0, CAM_Z);
 
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-  camera.position.set(0, -0.7, 12);
+  // --- artwork ----------------------------------------------------------
+  const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  const texSize = window.innerWidth < 760 ? 1024 : 2048;
+  const needs = { uz: shots.includes('uz') || shots.includes('both'), ma: shots.includes('ma') || shots.includes('both') };
+  const logo = needs.ma ? await loadImage(`${import.meta.env.BASE_URL}img/logo-full.webp`).catch(() => null) : null;
 
-  scene.add(new THREE.HemisphereLight(0xc6d4ff, 0x0b0f22, 0.32));
-  const key = new THREE.DirectionalLight(0xfff0d8, 3.3);
-  key.position.set(-7.5, 4.5, 4.2);
-  scene.add(key);
-  const rim = new THREE.DirectionalLight(0x7f9dff, 2.2);
-  rim.position.set(6, 2.5, -4);
-  scene.add(rim);
-  const warm = new THREE.PointLight(0xe2b765, 40, 22, 1.8);
-  warm.position.set(2.5, -3, 4.5);
-  scene.add(warm);
-
-  // --- artwork --------------------------------------------------------
-  const anisotropy = renderer.capabilities.getMaxAnisotropy();
-  const logo = await loadImage(`${import.meta.env.BASE_URL}img/logo-full.webp`).catch(() => null);
-  const uzArt = createUzbekistanFlag(anisotropy);
-  const maArt = createAcademyFlag(logo, anisotropy);
-
-  const timeU = { value: 0 };
-  const POLE_R = 0.036;
-  const gold = new THREE.MeshStandardMaterial({ color: 0xdcb267, metalness: 1, roughness: 0.22 });
-
-  const finialGeo = new THREE.LatheGeometry(
-    [
-      [0, 0], [0.062, 0], [0.072, 0.03], [0.05, 0.062], [0.038, 0.09], [0.06, 0.14],
-      [0.086, 0.22], [0.076, 0.32], [0.046, 0.46], [0.014, 0.6], [0, 0.63],
-    ].map(([r, y]) => new THREE.Vector2(r, y)),
-    36,
-  );
-  const ringGeo = new THREE.TorusGeometry(POLE_R * 1.35, 0.012, 10, 28);
-  const POLE_LEN = 16;
-  const poleGeo = new THREE.CylinderGeometry(POLE_R, POLE_R, POLE_LEN, 28, 1);
-
-  function buildFlag({ width, height, material, seed }) {
-    const group = new THREE.Group();
-    const uniforms = {
-      uTime: timeU,
-      uWind: { value: 1 },
-      uUnfurl: { value: reducedMotion ? 1 : 0 },
-      uSeed: { value: seed },
-      uFlag: { value: new THREE.Vector2(width, height) },
-    };
-    injectWave(material, uniforms);
-
-    const geo = new THREE.PlaneGeometry(width, height, 120, 60);
-    geo.translate(width / 2, 0, 0);
-    const cloth = new THREE.Mesh(geo, material);
-    cloth.position.set(POLE_R * 0.9, -height / 2, 0);
-    cloth.frustumCulled = false;
-    group.add(cloth);
-
-    const top = 0.14;
-    const pole = new THREE.Mesh(poleGeo, gold);
-    pole.position.y = top - POLE_LEN / 2;
-    group.add(pole);
-
-    const finial = new THREE.Mesh(finialGeo, gold);
-    finial.position.y = top;
-    group.add(finial);
-
-    [-0.04, -height + 0.04].forEach((y) => {
-      const ring = new THREE.Mesh(ringGeo, gold);
-      ring.rotation.x = Math.PI / 2;
-      ring.position.y = y;
-      group.add(ring);
-    });
-
-    return { group, uniforms };
-  }
-
-  const uzFlag = buildFlag({
-    width: 3.0,
-    height: 1.5,
-    seed: 0.0,
-    material: new THREE.MeshPhysicalMaterial({
-      map: uzArt.map,
-      side: THREE.DoubleSide,
-      roughness: 0.7,
-      metalness: 0,
-      sheen: 0.28,
-      sheenRoughness: 0.5,
-      sheenColor: new THREE.Color(0xffffff),
-    }),
-  });
-
-  const maFlag = buildFlag({
-    width: 2.46,
-    height: 1.64,
-    seed: 2.4,
-    material: new THREE.MeshPhysicalMaterial({
-      map: maArt.map,
-      roughnessMap: maArt.pbr,
-      metalnessMap: maArt.pbr,
-      roughness: 1,
-      metalness: 1,
-      side: THREE.DoubleSide,
-      alphaTest: 0.5,
-      alphaToCoverage: true,
-      sheen: 0.55,
-      sheenRoughness: 0.4,
-      sheenColor: new THREE.Color(0x4a66d8),
-    }),
-  });
-
-  // national flag: place of honour — viewer's left and higher
-  uzFlag.group.position.set(-1.95, 2.0, -0.7);
-  maFlag.group.position.set(-0.55, 0.28, 0.6);
+  const shared = {
+    uTime: { value: 0 },
+    uExposure: { value: 0 },
+    uLight: { value: new THREE.Vector3(-0.62, 0.42, 0.66).normalize() },
+  };
+  const geometry = new THREE.PlaneGeometry(FLAG_W, FLAG_H, 96, 48);
+  geometry.translate(FLAG_W / 2, -FLAG_H / 2, 0);
 
   const rig = new THREE.Group();
-  rig.add(uzFlag.group, maFlag.group);
   scene.add(rig);
 
-  // --- gold dust --------------------------------------------------------
-  const isSmall = window.matchMedia('(max-width: 760px)').matches;
-  const COUNT = isSmall ? 110 : 240;
-  const positions = new Float32Array(COUNT * 3);
-  const sizes = new Float32Array(COUNT);
-  const seeds = new Float32Array(COUNT);
-  for (let i = 0; i < COUNT; i++) {
-    positions[i * 3] = (Math.random() - 0.5) * 18;
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 14;
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 9 - 0.5;
-    sizes[i] = 0.6 + Math.pow(Math.random(), 3) * 3.4;
-    seeds[i] = Math.random();
-  }
-  const dustGeo = new THREE.BufferGeometry();
-  dustGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  dustGeo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
-  dustGeo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
-  const dust = new THREE.Points(
-    dustGeo,
-    new THREE.ShaderMaterial({
-      vertexShader: DUST_VERT,
-      fragmentShader: DUST_FRAG,
+  function makeFlag(art, gain) {
+    const material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      side: THREE.DoubleSide,
       uniforms: {
-        uTime: timeU,
-        uPixelRatio: { value: pixelRatio },
-        uColor: { value: new THREE.Color(0xf2cf8a) },
+        ...shared,
+        uMap: { value: art.map },
+        uMask: { value: art.mask ?? null },
+        uHasMask: { value: art.mask ? 1 : 0 },
+        uGain: { value: gain },
       },
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    }),
-  );
-  dust.frustumCulled = false;
-  scene.add(dust);
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.frustumCulled = false;
+    mesh.visible = false;
+    rig.add(mesh);
+    return mesh;
+  }
+
+  const flags = {
+    uz: needs.uz ? makeFlag(createUzbekistanFlag(anisotropy, texSize), 0.86) : null,
+    // navy silk is far darker than the national colours, so it is lit a little harder
+    ma: needs.ma ? makeFlag(createAcademyFlag(logo, anisotropy, texSize), 1.7) : null,
+  };
 
   // --- state ------------------------------------------------------------
   const state = {
-    baseX: 0,
-    baseY: 0,
-    baseRot: -0.5,
-    intro: reducedMotion ? 0 : 1, // 1 = poles still below the frame
+    started: reducedMotion,
+    shot: 0,
+    shotTime: reducedMotion ? TIMING.fadeIn : 0,
     scroll: 0,
+    pulse: 0,
     px: 0,
     py: 0,
     sx: 0,
     sy: 0,
-    gust: 0,
-    gustTarget: 0,
-    nextGust: 7,
+    visW: 1,
+    visH: 1,
+    aspect: 1,
     running: false,
     visible: true,
+    slowFrames: 0,
+    frames: 0,
+    acc: 0,
   };
+  const listeners = new Set();
+  const cycling = shots.length > 1 && !reducedMotion;
 
-  function layout() {
+  function applyShot() {
+    const placement = LAYOUTS[layout](shots[state.shot], state.aspect);
+    Object.entries(flags).forEach(([key, mesh]) => {
+      if (!mesh) return;
+      const p = placement[key];
+      mesh.visible = Boolean(p);
+      if (!p) return;
+      mesh.scale.setScalar((p.h * state.visH) / FLAG_H);
+      mesh.position.set((p.x - 0.5) * state.visW, (0.5 - p.y) * state.visH, key === 'ma' ? 0.25 : 0);
+    });
+  }
+
+  function resize() {
     const w = canvas.clientWidth || window.innerWidth;
     const h = canvas.clientHeight || window.innerHeight;
+    renderer.setPixelRatio(pixelRatio);
     renderer.setSize(w, h, false);
-    const aspect = w / h;
-    camera.aspect = aspect;
+    state.aspect = w / h;
+    camera.aspect = state.aspect;
     camera.updateProjectionMatrix();
+    state.visH = 2 * CAM_Z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    state.visW = state.visH * state.aspect;
+    applyShot();
+  }
 
-    const visH = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    const visW = visH * aspect;
-    // Portrait: flags sit above the copy. Landscape: flags on the right.
-    // Keep in sync with the `max-aspect-ratio: 1/1` block in styles.css.
-    const k = aspect <= 1 ? 0 : 1;
+  function nextShot() {
+    state.shot = (state.shot + 1) % shots.length;
+    state.shotTime = 0;
+    applyShot();
+    listeners.forEach((fn) => fn(state.shot, SHOT_LENGTH));
+  }
 
-    const scale = Math.min((visW * lerp(1.16, 0.54, k)) / 4.3, (visH * lerp(0.47, 0.8, k)) / 3.9);
-    rig.scale.setScalar(scale);
-    state.baseX = lerp(0.2 * scale, visW * 0.262, k);
-    state.baseY = lerp(visH * 0.135, -0.35, k);
-    state.baseRot = lerp(-0.42, -0.52, k);
+  function exposureAt(t) {
+    if (!state.started) return 0;
+    if (!cycling) return smooth(t / TIMING.fadeIn);
+    if (t < TIMING.fadeIn) return smooth(t / TIMING.fadeIn);
+    if (t < TIMING.fadeIn + TIMING.hold) return 1;
+    return 1 - smooth((t - TIMING.fadeIn - TIMING.hold) / TIMING.fadeOut);
   }
 
   let last = performance.now();
   function tick(now) {
-    const dt = Math.min((now - last) / 1000, 0.05);
+    // `real` drives the edit (fades land on time even at a low frame rate);
+    // `dt` drives the cloth, clamped so it never jumps after a stall.
+    const real = Math.min((now - last) / 1000, 1);
+    const dt = Math.min(real, 0.05);
     last = now;
 
-    // the wind is never perfectly steady: a stronger gust rolls through every few seconds
-    if (!reducedMotion && timeU.value > state.nextGust) {
-      state.gustTarget = Math.max(state.gustTarget, 0.45 + Math.random() * 0.4);
-      state.nextGust = timeU.value + 5 + Math.random() * 6;
+    // adaptive resolution: if frames run long, render fewer pixels
+    state.acc += real;
+    if (++state.frames >= 50) {
+      const avg = state.acc / state.frames;
+      state.frames = 0;
+      state.acc = 0;
+      if (avg > 0.036 && pixelRatio > 0.8) {
+        pixelRatio = Math.max(0.8, pixelRatio - 0.25);
+        resize();
+      }
     }
-    state.gustTarget *= Math.exp(-dt * 2.4);
-    state.gust += (state.gustTarget - state.gust) * (1 - Math.exp(-dt * 3.2));
-    state.sx += (state.px - state.sx) * (1 - Math.exp(-dt * 2.6));
-    state.sy += (state.py - state.sy) * (1 - Math.exp(-dt * 2.6));
 
-    const speed = reducedMotion ? 0.35 : 1;
-    timeU.value += dt * speed * (1 + state.gust * 0.9);
-    const t = timeU.value;
-    uzFlag.uniforms.uWind.value = (1 + state.gust * 0.5) * (0.94 + 0.06 * Math.sin(t * 0.31));
-    maFlag.uniforms.uWind.value = (1 + state.gust * 0.5) * (0.94 + 0.06 * Math.sin(t * 0.27 + 1.7));
+    shared.uTime.value += dt * (reducedMotion ? 0.3 : 1);
+    if (state.started) state.shotTime += real;
+    if (cycling && state.shotTime >= SHOT_LENGTH) nextShot();
 
-    rig.position.set(state.baseX, state.baseY - state.intro * 9 + state.scroll * 2.4, 0);
-    rig.rotation.y = state.baseRot + state.sx * 0.11 + state.scroll * 0.42;
-    rig.rotation.x = state.sy * 0.04;
+    state.pulse *= Math.exp(-real * 1.6);
+    state.sx += (state.px - state.sx) * (1 - Math.exp(-dt * 1.8));
+    state.sy += (state.py - state.sy) * (1 - Math.exp(-dt * 1.8));
 
-    camera.position.x = state.sx * 0.45;
-    camera.position.y = -0.7 - state.sy * 0.28;
-    camera.lookAt(0, 0.15, 0);
+    shared.uExposure.value = exposureAt(state.shotTime) * 0.6 * brightness * (1 - state.scroll * 0.85) * (1 + state.pulse * 0.7);
+
+    // slow push-in over the length of the shot, a breath of parallax from the pointer
+    const p = cycling ? state.shotTime / SHOT_LENGTH : 0.5 + 0.5 * Math.sin(shared.uTime.value * 0.12);
+    camera.position.z = CAM_Z - 0.55 * p;
+    camera.position.x = (p - 0.5) * 0.16 + state.sx * 0.07;
+    camera.position.y = -state.sy * 0.05;
+    rig.rotation.y = -0.06 + state.sx * 0.02;
+    rig.position.y = state.scroll * 0.7;
 
     renderer.render(scene, camera);
   }
@@ -350,12 +343,10 @@ export async function createHero(canvas, { reducedMotion = false } = {}) {
   const onPointer = (e) => {
     state.px = (e.clientX / window.innerWidth) * 2 - 1;
     state.py = (e.clientY / window.innerHeight) * 2 - 1;
-    const v = Math.hypot(e.movementX || 0, e.movementY || 0);
-    state.gustTarget = Math.min(1, state.gustTarget + v / 500);
   };
-  window.addEventListener('pointermove', onPointer, { passive: true });
+  if (!reducedMotion) window.addEventListener('pointermove', onPointer, { passive: true });
 
-  const ro = new ResizeObserver(layout);
+  const ro = new ResizeObserver(resize);
   ro.observe(canvas);
   const io = new IntersectionObserver(
     ([entry]) => {
@@ -365,35 +356,59 @@ export async function createHero(canvas, { reducedMotion = false } = {}) {
     { threshold: 0 },
   );
   io.observe(canvas);
-  document.addEventListener('visibilitychange', () => setRunning(state.visible && !document.hidden));
+  const onVisibility = () => setRunning(state.visible && !document.hidden);
+  document.addEventListener('visibilitychange', onVisibility);
 
-  layout();
+  resize();
   renderer.compile(scene, camera);
   tick(performance.now());
   setRunning(true);
 
-  return {
-    /** Poles rise into frame, then the cloth unfurls. */
+  const api = {
+    shots,
+    shotLength: SHOT_LENGTH,
+    /** Fade the first shot up from black. */
     intro() {
-      if (reducedMotion) return gsap.timeline();
-      return gsap
-        .timeline()
-        .to(state, { intro: 0, duration: 2.1, ease: 'expo.out' }, 0)
-        .to(uzFlag.uniforms.uUnfurl, { value: 1, duration: 2.6, ease: 'power3.out' }, 0.55)
-        .to(maFlag.uniforms.uUnfurl, { value: 1, duration: 2.6, ease: 'power3.out' }, 0.85);
+      if (state.started) return;
+      state.started = true;
+      state.shotTime = 0;
+      listeners.forEach((fn) => fn(state.shot, SHOT_LENGTH));
+    },
+    /** fn(shotIndex, seconds) — called whenever a new shot begins. */
+    onShot(fn) {
+      listeners.add(fn);
     },
     setScroll(p) {
       state.scroll = clamp(p, 0, 1);
     },
-    gust(amount = 1) {
-      state.gustTarget = Math.min(1, state.gustTarget + amount);
+    /** A brief swell of light (used when the sign-up succeeds). */
+    pulse() {
+      state.pulse = 1;
     },
     dispose() {
       setRunning(false);
       ro.disconnect();
       io.disconnect();
       window.removeEventListener('pointermove', onPointer);
+      document.removeEventListener('visibilitychange', onVisibility);
       renderer.dispose();
     },
   };
+
+  // Dev only: jump to a shot at a given moment and draw exactly one frame.
+  if (import.meta.env.DEV) {
+    api.debugFrame = (shotIndex, seconds = TIMING.fadeIn + 1, time = 12) => {
+      setRunning(false);
+      state.started = true;
+      state.shot = shotIndex;
+      state.shotTime = seconds;
+      shared.uTime.value = time;
+      applyShot();
+      last = performance.now();
+      tick(last);
+      return { pixelRatio, aspect: state.aspect, exposure: shared.uExposure.value };
+    };
+    window.__maScene = api;
+  }
+  return api;
 }
