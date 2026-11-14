@@ -183,10 +183,108 @@ export function CourseGrid({ courses, filter = 'all' }) {
  * Drag sideways to spin it; a card opens that course. Give it a `key` that changes with the
  * list — the ring measures its cards once when it mounts.
  */
+/**
+ * A quiet starfield on a 2D canvas behind the course ring. Stars sit at different depths:
+ * near ones drift further as the ring turns (parallax), all of them twinkle slowly, and
+ * now and then a thin shooting star crosses the sky. Drawn in the ring's own frame loop.
+ */
+function createStarfield(canvas) {
+  const ctx = canvas.getContext('2d');
+  const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+  let w = 0;
+  let h = 0;
+  let stars = [];
+  let time = 0;
+  let shoot = null;
+  let nextShoot = 4 + Math.random() * 5;
+
+  const resize = () => {
+    w = canvas.clientWidth;
+    h = canvas.clientHeight;
+    canvas.width = Math.round(w * ratio);
+    canvas.height = Math.round(h * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const count = Math.min(320, Math.round((w * h) / 3200));
+    stars = Array.from({ length: count }, () => {
+      const z = Math.random() ** 1.8; // most stars far away and faint
+      return {
+        x: Math.random(),
+        y: Math.random(),
+        z,
+        r: 0.35 + z * 1.25,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.6 + Math.random() * 1.6,
+        gold: Math.random() < 0.18,
+      };
+    });
+  };
+
+  const draw = (angle, dt) => {
+    if (!w || !h) return;
+    time += reducedMotion ? 0 : dt;
+    ctx.clearRect(0, 0, w, h);
+
+    for (const s of stars) {
+      // the ring's turn moves near stars further than far ones
+      let x = (s.x * w + angle * (2 + s.z * 7)) % w;
+      if (x < 0) x += w;
+      const y = s.y * h;
+      const twinkle = 0.55 + 0.45 * Math.sin(time * s.speed + s.phase);
+      const alpha = (0.24 + s.z * 0.76) * twinkle;
+      ctx.fillStyle = s.gold ? `rgba(246, 222, 166, ${alpha})` : `rgba(214, 224, 255, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(x, y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+      if (s.z > 0.82) {
+        // the brightest few get a soft cross of light
+        ctx.fillStyle = s.gold ? `rgba(246, 222, 166, ${alpha * 0.35})` : `rgba(214, 224, 255, ${alpha * 0.35})`;
+        ctx.fillRect(x - s.r * 4, y - 0.4, s.r * 8, 0.8);
+        ctx.fillRect(x - 0.4, y - s.r * 4, 0.8, s.r * 8);
+      }
+    }
+
+    if (reducedMotion) return;
+    nextShoot -= dt;
+    if (!shoot && nextShoot <= 0) {
+      shoot = { x: w * (0.2 + Math.random() * 0.7), y: h * Math.random() * 0.35, life: 0 };
+      nextShoot = 6 + Math.random() * 8;
+    }
+    if (shoot) {
+      shoot.life += dt;
+      const k = shoot.life / 0.9;
+      if (k >= 1) {
+        shoot = null;
+      } else {
+        const len = 120;
+        const x = shoot.x - k * 260;
+        const y = shoot.y + k * 110;
+        const g = ctx.createLinearGradient(x, y, x + len, y - len * 0.42);
+        const a = Math.sin(Math.PI * k) * 0.8;
+        g.addColorStop(0, `rgba(255, 240, 205, ${a})`);
+        g.addColorStop(1, 'rgba(255, 240, 205, 0)');
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + len, y - len * 0.42);
+        ctx.stroke();
+      }
+    }
+  };
+
+  return { resize, draw, dispose: () => ctx.clearRect(0, 0, w, h) };
+}
+
+/** Cards on the ring: a short list is repeated so the ring is always full (at least RING_SLOTS cards). */
+const RING_SLOTS = 12;
+
 export function CourseRing({ courses }) {
   const { t } = useI18n();
   const stage = useRef(null);
   const track = useRef(null);
+  const stars = useRef(null);
+  const rounds = Math.max(1, Math.ceil(RING_SLOTS / courses.length));
+  const slots = Array.from({ length: rounds }, () => courses).flat();
 
   useEffect(() => {
     const box = stage.current;
@@ -197,15 +295,21 @@ export function CourseRing({ courses }) {
     let last = performance.now();
     let visible = false;
 
+    const sky = createStarfield(stars.current);
+
     const apply = () => {
-      el.style.transform = `rotateX(-5deg) translateZ(${-state.radius}px) rotateY(${state.angle.toFixed(3)}deg)`;
+      el.style.transform = `rotateX(-4deg) translateZ(${-state.radius}px) rotateY(${state.angle.toFixed(3)}deg)`;
     };
     const layout = () => {
       const card = el.firstElementChild;
-      const gap = Math.max(14, card.offsetWidth * 0.11);
-      state.radius = Math.round((count * (card.offsetWidth + gap)) / (Math.PI * 2));
+      const gap = Math.max(24, card.offsetWidth * 0.3);
+      // wide: the ring always spans most of the screen, however few cards it has
+      const fromCards = (count * (card.offsetWidth + gap)) / (Math.PI * 2);
+      state.radius = Math.round(Math.max(fromCards, box.clientWidth * 0.46));
       el.style.setProperty('--r', `${state.radius}px`);
+      sky.resize();
       apply();
+      sky.draw(state.angle, 0);
     };
 
     const tick = (now) => {
@@ -217,6 +321,7 @@ export function CourseRing({ courses }) {
         if (!state.hover && !reducedMotion) state.angle -= 4.5 * dt; // idle drift, degrees per second
       }
       apply();
+      sky.draw(state.angle, dt);
       frame = requestAnimationFrame(tick);
     };
     const run = (on) => {
@@ -285,6 +390,7 @@ export function CourseRing({ courses }) {
       ro.disconnect();
       io.disconnect();
       box.removeEventListener('pointerdown', onDown);
+      sky.dispose();
       box.removeEventListener('click', onClick, true);
       box.removeEventListener('pointerenter', onEnter);
       box.removeEventListener('pointerleave', onLeave);
@@ -297,17 +403,20 @@ export function CourseRing({ courses }) {
 
   return (
     <div className="ring" data-reveal="">
+      <canvas className="ring__stars" ref={stars} aria-hidden="true" />
       <div className="ring__stage" ref={stage}>
         <div className="ring__track" ref={track}>
-          {courses.map((course, i) => (
+          {slots.map((course, i) => (
             <Link
-              key={course.id}
+              key={`${course.id}-${i}`}
               className="course ring__card"
               to={courseHref(course)}
               draggable={false}
-              style={{ '--a': `${(360 / courses.length) * i}deg` }}
+              tabIndex={i < courses.length ? undefined : -1}
+              aria-hidden={i < courses.length ? undefined : true}
+              style={{ '--a': `${(360 / slots.length) * i}deg` }}
             >
-              <CourseFace course={course} index={i} />
+              <CourseFace course={course} index={i % courses.length} />
             </Link>
           ))}
         </div>

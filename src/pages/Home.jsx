@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { useI18n } from '../i18n/index.jsx';
 import { usePage } from '../components/Layout.jsx';
-import { CourseGrid, CourseRing, Cta, Eyebrow, Features, Stats } from '../components/Blocks.jsx';
+import { CourseRing, Cta, Eyebrow, Features, Stats } from '../components/Blocks.jsx';
 import { FlagBackdrop, LanguageGlobe } from '../components/Scenes.jsx';
 import { PostCard } from '../components/NewsParts.jsx';
 import Icon from '../components/Icon.jsx';
@@ -26,9 +26,6 @@ function firstVisit() {
     return true;
   }
 }
-
-// fewer courses than this look sparse on the 3D ring, so they are shown as cards instead
-const RING_MIN = 6;
 
 export default function Home() {
   const { t, html, lang } = useI18n();
@@ -274,7 +271,7 @@ export default function Home() {
       <FounderSection />
 
       {/* ============ COURSES (preview) ============ */}
-      <section className="section courses">
+      <section className="section courses courses--ring">
         <div className="container">
           <header className="section__head">
             <div>
@@ -290,14 +287,9 @@ export default function Home() {
             </Link>
           </header>
         </div>
-        {catalog &&
-          (catalog.courses.length >= RING_MIN ? (
-            <CourseRing key={catalog.courses.map((c) => c.id).join()} courses={catalog.courses} />
-          ) : (
-            <div className="container">
-              <CourseGrid courses={catalog.courses} />
-            </div>
-          ))}
+        {catalog && catalog.courses.length > 0 && (
+          <CourseRing key={catalog.courses.map((c) => c.id).join()} courses={catalog.courses} />
+        )}
       </section>
 
       {/* ============ WORLD LANGUAGES (3D globe) ============ */}

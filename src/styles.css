@@ -2165,32 +2165,57 @@ svg {
   position: relative;
 }
 
+/* the night sky behind the ring; it reaches up behind the section heading,
+   so the heading is lifted above it */
+.courses--ring {
+  isolation: isolate;
+}
+
+.courses--ring > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ring__stars {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -340px;
+  bottom: -40px;
+  z-index: -1;
+  width: 100%;
+  height: calc(100% + 380px);
+  pointer-events: none;
+  -webkit-mask: linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
+  mask: linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
+}
+
 .ring::after {
   content: '';
   position: absolute;
   left: 50%;
   bottom: 2.4rem;
-  width: min(72%, 920px);
-  height: 70px;
+  width: min(86%, 1200px);
+  height: 80px;
   translate: -50% 0;
   background: radial-gradient(closest-side, rgba(217, 178, 106, 0.16), transparent);
   pointer-events: none;
 }
 
 .ring__stage {
-  --w: clamp(150px, 16vw, 230px);
+  --w: clamp(160px, 16.5vw, 240px);
   --h: calc(var(--w) * 1.18);
   position: relative;
-  height: calc(var(--h) + clamp(70px, 9vw, 130px));
-  perspective: 1500px;
+  height: calc(var(--h) + clamp(90px, 10vw, 150px));
+  perspective: 1700px;
   perspective-origin: 50% 46%;
   overflow: hidden;
   touch-action: pan-y;
   cursor: grab;
   -webkit-user-select: none;
   user-select: none;
-  -webkit-mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
-  mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  -webkit-mask: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
 }
 
 .ring__stage[data-dragging] {
