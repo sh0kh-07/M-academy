@@ -15,12 +15,22 @@ import { reducedMotion } from './env.js';
 let lenis = null;
 let locks = 0;
 
+const tick = (time) => lenis?.raf(time * 1000);
+
 export function startSmoothScroll() {
   if (lenis || reducedMotion) return;
   lenis = new Lenis({ lerp: 0.1 }); // lower = longer glide, higher = snappier
-  gsap.ticker.add((time) => lenis.raf(time * 1000));
+  gsap.ticker.add(tick);
   gsap.ticker.lagSmoothing(0);
   if (locks > 0) lenis.stop();
+}
+
+/** Back to plain native scrolling (the admin panel). startSmoothScroll() turns it on again. */
+export function stopSmoothScroll() {
+  if (!lenis) return;
+  gsap.ticker.remove(tick);
+  lenis.destroy();
+  lenis = null;
 }
 
 /** The Lenis instance, or null when smooth scrolling is off. */

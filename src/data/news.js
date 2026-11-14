@@ -1,7 +1,10 @@
 /*
-  News posts ("Yangiliklar").
+  Sample news posts ("Yangiliklar").
 
-  To publish a post, add an object to the top of this list:
+  Real posts now come from the backend (admin panel → Yangiliklar; see src/lib/newsFeed.js).
+  These samples only show while the backend has no published post.
+
+  Fields:
     slug   — the address of the post: /news/<slug> (latin letters, digits, dashes)
     date   — YYYY-MM-DD; the list is shown newest first
     cat    — 'announce' | 'course' | 'event' | 'tech' (labels are in src/i18n/dict.js → news.cat.*)
@@ -222,23 +225,42 @@ export const NEWS = [
 ];
 
 /** Newest first. */
-export const POSTS = [...NEWS].sort((a, b) => b.date.localeCompare(a.date));
-
 const MONTHS = {
   uz: ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'],
   ru: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
   en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 };
 
-/** '2026-11-10' → '10-noyabr, 2026' / '10 ноября 2026' / '10 November 2026' */
-export function formatDate(iso, lang) {
-  const [y, m, d] = iso.split('-').map(Number);
+/** '2026-11-10' or an ISO timestamp → '10-noyabr, 2026' / '10 ноября 2026' / '10 November 2026' */
+export function formatDate(value, lang) {
+  if (!value) return '';
+  let y;
+  let m;
+  let d;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    [y, m, d] = value.split('-').map(Number);
+  } else {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    [y, m, d] = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
+  }
   const month = MONTHS[lang][m - 1];
   return lang === 'uz' ? `${d}-${month}, ${y}` : `${d} ${month} ${y}`;
 }
 
-/** Rough reading time in whole minutes. */
+/** A post's full text as paragraphs: sample posts keep a list, posts from the API one text split on line breaks. */
+export function paragraphs(post, lang) {
+  const body = post.body?.[lang] || post.body?.uz || post.body?.ru || post.body?.en || '';
+  if (Array.isArray(body)) return body;
+  return String(body)
+    .split(/\n\s*\n|\r?\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+/** Reading time in whole minutes: the server's figure when there is one, otherwise ~160 words a minute. */
 export function readingMinutes(post, lang) {
-  const words = post[lang].body.join(' ').split(/\s+/).length;
+  if (post.minutes) return post.minutes;
+  const words = paragraphs(post, lang).join(' ').split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 160));
 }

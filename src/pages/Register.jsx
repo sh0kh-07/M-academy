@@ -6,36 +6,70 @@ import { usePage } from '../components/Layout.jsx';
 import { Eyebrow } from '../components/Blocks.jsx';
 import { FlagBackdrop } from '../components/Scenes.jsx';
 import Icon from '../components/Icon.jsx';
-import { CONFIG, COURSES } from '../data/courses.js';
-import { finePointer, reducedMotion, wait } from '../lib/env.js';
+import { COURSES } from '../data/courses.js';
+import { finePointer, reducedMotion } from '../lib/env.js';
+import { useCatalog } from '../lib/catalog.js';
+import { getJSON, pick, postJSON, records } from '../lib/http.js';
 
-const GROUPS = [
-  ['lang', 'courses.lang'],
-  ['exact', 'courses.exact'],
-  ['social', 'courses.social'],
-];
+const NAME_RE = /^[\p{L}\s'‘’ʻʼ.-]+$/u; // the server accepts letters only
+/** "90 123 45 67", "+998 90 123-45-67" → "+998901234567"; null if it isn't an Uzbek number */
+function normalizePhone(value = '') {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length === 9) return `+998${digits}`;
+  if (digits.length === 12 && digits.startsWith('998')) return `+${digits}`;
+  return null;
+}
+
+/** Which of our messages fits the server's validation errors best. */
+function serverError(err) {
+  if (err.status === 429) return 'form.errTooMany';
+  const text = (err.messages ?? []).join(' ');
+  if (/full_name|ism/i.test(text)) return 'form.errName';
+  if (/age|yosh/i.test(text)) return 'form.errAge';
+  if (/phone|telefon/i.test(text)) return 'form.error';
+  if (/region|viloyat/i.test(text)) return 'form.errRegion';
+  return 'form.errServer';
+}
+
 const STEPS = ['reg.s1', 'reg.s2', 'reg.s3'];
 const pad = (n) => String(n).padStart(2, '0');
 
 /**
  * Sign-up in three steps, with a "pass" on the left that fills in live
  * as the visitor chooses a direction and types their name.
- * /register?course=3 arrives from the course cards with a direction already chosen.
+ * /register?course=ingliz-tili arrives from a course page with that course already chosen
+ * (the old numeric form, ?course=3, still works).
  */
 export default function Register() {
   const { t, html, lang } = useI18n();
   usePage('title.register');
   const [params] = useSearchParams();
 
+  const catalog = useCatalog();
+  // the chosen course's slug
   const [course, setCourse] = useState(() => {
     const raw = params.get('course');
-    const index = Number(raw);
-    return raw !== null && raw !== '' && Number.isInteger(index) && COURSES[index] ? index : null;
+    if (!raw) return null;
+    return /^\d+$/.test(raw) ? (COURSES[Number(raw)]?.slug ?? null) : raw;
   });
   const [step, setStep] = useState(1);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [error, setError] = useState(false);
+  const [age, setAge] = useState('');
+  const [region, setRegion] = useState('');
+  const [regionList, setRegionList] = useState([]);
+  const [error, setError] = useState(null); // a dictionary key, e.g. 'form.errAge'
+
+  // regions for the "Viloyat" choice: GET /api/regions → [{ key, name: { uz, ru, en } }]
+  useEffect(() => {
+    let alive = true;
+    getJSON('/regions')
+      .then((d) => alive && setRegionList(records(d)))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
   const [sending, setSending] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [shine, setShine] = useState(false);
@@ -47,6 +81,19 @@ export default function Register() {
   const scene = useRef(null);
   const moving = useRef(false);
   const heightBefore = useRef(0);
+
+  const chosen = (course && catalog?.courses.find((c) => c.slug === course)) || null;
+  // categories with their courses; courses without a category go last, untitled
+  const groups = catalog
+    ? [
+        ...catalog.cats.map((cat) => ({
+          key: cat.key,
+          label: cat.title ? pick(cat.title, lang) : t(`courses.${cat.key}`),
+          items: catalog.courses.filter((c) => c.cat === cat.key),
+        })),
+        { key: 'other', label: '', items: catalog.courses.filter((c) => !catalog.cats.some((cat) => cat.key === c.cat)) },
+      ].filter((g) => g.items.length)
+    : [];
 
   // date and application number printed on the pass
   const stamp = useMemo(() => {
@@ -151,8 +198,20 @@ export default function Register() {
     if (step !== 2 || sending || moving.current) return;
 
     const cleanName = name.trim();
-    if (cleanName.length < 2 || phone.replace(/\D/g, '').length < 9) {
-      setError(true);
+    const years = Number(age);
+    const cleanPhone = normalizePhone(phone);
+    const problem =
+      cleanName.length < 2 || !NAME_RE.test(cleanName)
+        ? 'form.errName'
+        : !Number.isInteger(years) || years < 3 || years > 100
+          ? 'form.errAge'
+          : !cleanPhone
+            ? 'form.error'
+            : !region
+              ? 'form.errRegion'
+              : null;
+    if (problem) {
+      setError(problem);
       if (!reducedMotion) {
         requestAnimationFrame(() => {
           if (errorRef.current) gsap.fromTo(errorRef.current, { x: -6 }, { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.35)' });
@@ -160,42 +219,25 @@ export default function Register() {
       }
       return;
     }
-    setError(false);
+    setError(null);
     setSending(true);
 
-    const payload = {
-      name: cleanName,
-      phone: phone.trim(),
-      course: course == null ? null : COURSES[course].uz,
-      lang,
-      ref: stamp.id,
-    };
+    // POST /api/leads — exactly these fields: the server rejects anything else
+    const payload = { full_name: cleanName, age: years, phone: cleanPhone, region };
+    if (chosen?.live) payload.course_id = chosen.id; // only courses from the backend have an id
     try {
-      if (CONFIG.formEndpoint) {
-        const res = await fetch(CONFIG.formEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      } else {
-        // Demo mode: no endpoint configured in src/data/courses.js → nothing is sent.
-        console.info('[M.ACADEMY] sign-up form is in demo mode, payload:', payload);
-        await wait(450);
-      }
+      await postJSON('/leads', payload);
       go(3);
       setAccepted(true);
       setShine(true);
       scene.current?.pulse();
     } catch (err) {
-      console.error('[M.ACADEMY] sign-up failed', err);
-      setError(true);
+      setError(serverError(err));
     } finally {
       setSending(false);
     }
   };
 
-  const chosen = course == null ? null : COURSES[course];
   const cleanName = name.trim();
 
   return (
@@ -244,13 +286,13 @@ export default function Register() {
                     </div>
                     <div>
                       <dt>{t('pass.track')}</dt>
-                      <dd key={`${course}`} className={`swap-in${chosen ? '' : ' is-empty'}`}>
-                        {chosen ? chosen[lang] : t('pass.trackPh')}
+                      <dd key={`${chosen?.id}`} className={`swap-in${chosen ? '' : ' is-empty'}`}>
+                        {chosen ? pick(chosen.title, lang) : t('pass.trackPh')}
                       </dd>
                     </div>
                   </dl>
-                  <div className="pass__glyph swap-in" key={`${course}`}>
-                    {chosen ? chosen.g : 'M'}
+                  <div className="pass__glyph swap-in" key={`${chosen?.id}`}>
+                    {chosen ? chosen.glyph || 'M' : 'M'}
                   </div>
                 </div>
 
@@ -300,32 +342,30 @@ export default function Register() {
               <section className="pane" key="1">
                 <h2 className="pane__title">{t('reg.q1')}</h2>
                 <div className="choices">
-                  {GROUPS.map(([cat, key]) => (
-                    <div className="choices__group" key={cat}>
-                      <b>{t(key)}</b>
+                  {groups.map((group) => (
+                    <div className="choices__group" key={group.key}>
+                      {group.label && <b>{group.label}</b>}
                       <div className="choices__list">
-                        {COURSES.map((item, i) =>
-                          item.cat === cat ? (
-                            <button
-                              key={i}
-                              type="button"
-                              className={`choice${course === i ? ' is-selected' : ''}`}
-                              aria-pressed={course === i}
-                              onClick={() => setCourse(i)}
-                            >
-                              <i>{item.g}</i>
-                              {item[lang]}
-                            </button>
-                          ) : null,
-                        )}
+                        {group.items.map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            className={`choice${chosen === item ? ' is-selected' : ''}`}
+                            aria-pressed={chosen === item}
+                            onClick={() => setCourse(item.slug)}
+                          >
+                            {item.glyph && <i>{item.glyph}</i>}
+                            {pick(item.title, lang)}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   ))}
                   <div className="choices__list">
                     <button
                       type="button"
-                      className={`choice choice--plain${course == null ? ' is-selected' : ''}`}
-                      aria-pressed={course == null}
+                      className={`choice choice--plain${chosen == null ? ' is-selected' : ''}`}
+                      aria-pressed={chosen == null}
                       onClick={() => setCourse(null)}
                     >
                       {t('reg.undecided')}
@@ -372,9 +412,37 @@ export default function Register() {
                   <span>{t('form.phone')}</span>
                   <i />
                 </label>
+                <div className="field-row">
+                  <label className="field">
+                    <input
+                      type="number"
+                      name="age"
+                      inputMode="numeric"
+                      min={3}
+                      max={100}
+                      placeholder=" "
+                      value={age}
+                      onChange={(e) => setAge(e.target.value.replace(/\D/g, '').slice(0, 3))}
+                    />
+                    <span>{t('form.age')}</span>
+                    <i />
+                  </label>
+                  <label className="field field--select">
+                    <select name="region" value={region} data-filled={region ? '' : undefined} onChange={(e) => setRegion(e.target.value)}>
+                      <option value="" disabled hidden />
+                      {regionList.map((r) => (
+                        <option key={r.key} value={r.key}>
+                          {pick(r.name, lang)}
+                        </option>
+                      ))}
+                    </select>
+                    <span>{t('form.region')}</span>
+                    <i />
+                  </label>
+                </div>
                 {error && (
                   <p className="reg__error" role="alert" ref={errorRef}>
-                    {t('form.error')}
+                    {t(error)}
                   </p>
                 )}
                 <p className="reg__note">{t('reg.note')}</p>

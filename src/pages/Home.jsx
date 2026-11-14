@@ -3,14 +3,16 @@ import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { useI18n } from '../i18n/index.jsx';
 import { usePage } from '../components/Layout.jsx';
-import { CourseRing, Cta, Eyebrow, Features, Stats } from '../components/Blocks.jsx';
+import { CourseGrid, CourseRing, Cta, Eyebrow, Features, Stats } from '../components/Blocks.jsx';
 import { FlagBackdrop, LanguageGlobe } from '../components/Scenes.jsx';
 import { PostCard } from '../components/NewsParts.jsx';
 import Icon from '../components/Icon.jsx';
 import { COURSES } from '../data/courses.js';
 import { PLACES } from '../data/places.js';
-import { POSTS } from '../data/news.js';
 import { reducedMotion, wait } from '../lib/env.js';
+import { FALLBACK, useCatalog } from '../lib/catalog.js';
+import { useFeed } from '../lib/newsFeed.js';
+import { pick } from '../lib/http.js';
 import { lockScroll, scrollToElement, unlockScroll } from '../lib/scroll.js';
 
 /** The logo preloader is shown once per browser session, on the first visit to the home page. */
@@ -24,8 +26,13 @@ function firstVisit() {
   }
 }
 
+// fewer courses than this look sparse on the 3D ring, so they are shown as cards instead
+const RING_MIN = 6;
+
 export default function Home() {
   const { t, html, lang } = useI18n();
+  const catalog = useCatalog();
+  const feed = useFeed();
   const ready = usePage('title.home', { autoReady: false });
 
   const [preloader, setPreloader] = useState(() => firstVisit() && !reducedMotion);
@@ -160,7 +167,7 @@ export default function Home() {
     gate.current.open();
   };
 
-  const marquee = COURSES.map((course) => course[lang]);
+  const marquee = (catalog ?? FALLBACK).courses.map((course) => pick(course.title, lang));
 
   return (
     <main ref={root}>
@@ -279,7 +286,14 @@ export default function Home() {
             </Link>
           </header>
         </div>
-        <CourseRing />
+        {catalog &&
+          (catalog.courses.length >= RING_MIN ? (
+            <CourseRing key={catalog.courses.map((c) => c.id).join()} courses={catalog.courses} />
+          ) : (
+            <div className="container">
+              <CourseGrid courses={catalog.courses} />
+            </div>
+          ))}
       </section>
 
       {/* ============ WORLD LANGUAGES (3D globe) ============ */}
@@ -294,7 +308,7 @@ export default function Home() {
             <ul className="world__langs" data-reveal="">
               {PLACES.map(({ course }) => (
                 <li key={course}>
-                  <Link to={`/register?course=${course}`}>
+                  <Link to={`/register?course=${COURSES[course].slug}`}>
                     <i>{COURSES[course].g}</i>
                     {COURSES[course][lang]}
                   </Link>
@@ -323,8 +337,8 @@ export default function Home() {
             </Link>
           </header>
           <div className="posts">
-            {POSTS.slice(0, 3).map((post) => (
-              <PostCard post={post} key={post.slug} />
+            {feed?.posts.slice(0, 3).map((post) => (
+              <PostCard post={post} key={post.id} />
             ))}
           </div>
         </div>

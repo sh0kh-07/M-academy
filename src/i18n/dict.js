@@ -51,7 +51,7 @@ export const dict = {
 
     'courses.eyebrow': 'Kurslar',
     'courses.title': 'Bilim olamiga <em>yo‘l oching</em>',
-    'courses.sub': 'Xorijiy tillardan tortib aniq va ijtimoiy fanlargacha — 16 ta yo‘nalish.',
+    'courses.sub': 'Xorijiy tillardan tortib aniq va ijtimoiy fanlargacha — barcha yo‘nalishlar bitta maktabda.',
     'courses.allLink': 'Barcha kurslar',
     'courses.all': 'Barchasi',
     'courses.lang': 'Tillar',
@@ -276,7 +276,7 @@ export const dict = {
     'about.f3.text': 'Обучение, усиленное искусственным интеллектом и интерактивными инструментами.',
     'courses.eyebrow': 'Курсы',
     'courses.title': 'Откройте путь <em>в мир знаний</em>',
-    'courses.sub': 'От иностранных языков до точных и общественных наук — 16 направлений.',
+    'courses.sub': 'От иностранных языков до точных и общественных наук — все направления в одной школе.',
     'courses.all': 'Все',
     'courses.lang': 'Языки',
     'courses.exact': 'Точные науки',
@@ -449,7 +449,7 @@ export const dict = {
     'about.f3.text': 'A learning experience enriched with AI and interactive tools.',
     'courses.eyebrow': 'Courses',
     'courses.title': 'Open the door to <em>a world of knowledge</em>',
-    'courses.sub': 'From foreign languages to exact and social sciences — 16 tracks.',
+    'courses.sub': 'From foreign languages to exact and social sciences — every track in one school.',
     'courses.all': 'All',
     'courses.lang': 'Languages',
     'courses.exact': 'Exact sciences',
@@ -538,3 +538,108 @@ export const dict = {
     'form.submit': 'Send request',
   },
 };
+
+/* ---------- course page (/courses/:slug) ---------- */
+const COURSE_PAGE = {
+  uz: {
+    'title.course': 'Kurs — M.ACADEMY',
+    'course.back': 'Barcha kurslar',
+    'course.apply': 'Ariza berish',
+    'course.metaCategory': 'Yo‘nalish',
+    'course.metaLessons': 'Darslar',
+    'course.metaTeachers': 'Ustozlar',
+    'course.demo': 'Demo <em>dars</em>',
+    'course.demoText': 'Mashg‘ulotlar qanday o‘tishini qisqa namunaviy darsda ko‘ring.',
+    'course.about': 'Kurs haqida',
+    'course.program': 'Kurs <em>dasturi</em>',
+    'course.programText': 'Darslar shu tartibda o‘tiladi.',
+    'course.teachers': 'Kurs <em>ustozlari</em>',
+    'course.watch': 'Videoni ko‘rish',
+    'course.missing': 'Kurs topilmadi',
+    'course.missingText': 'Bu kurs o‘chirilgan yoki hali e’lon qilinmagan.',
+    'course.error': 'Kursni yuklab bo‘lmadi. Birozdan keyin qayta urinib ko‘ring.',
+    'course.retry': 'Qayta urinish',
+  },
+  ru: {
+    'title.course': 'Курс — M.ACADEMY',
+    'course.back': 'Все курсы',
+    'course.apply': 'Подать заявку',
+    'course.metaCategory': 'Направление',
+    'course.metaLessons': 'Уроки',
+    'course.metaTeachers': 'Преподаватели',
+    'course.demo': 'Демо-<em>урок</em>',
+    'course.demoText': 'Посмотрите короткий пробный урок — так проходят занятия.',
+    'course.about': 'О курсе',
+    'course.program': 'Программа <em>курса</em>',
+    'course.programText': 'Уроки идут в этом порядке.',
+    'course.teachers': 'Преподаватели <em>курса</em>',
+    'course.watch': 'Смотреть видео',
+    'course.missing': 'Курс не найден',
+    'course.missingText': 'Курс удалён или ещё не опубликован.',
+    'course.error': 'Не удалось загрузить курс. Попробуйте чуть позже.',
+    'course.retry': 'Повторить',
+  },
+  en: {
+    'title.course': 'Course — M.ACADEMY',
+    'course.back': 'All courses',
+    'course.apply': 'Apply',
+    'course.metaCategory': 'Track',
+    'course.metaLessons': 'Lessons',
+    'course.metaTeachers': 'Teachers',
+    'course.demo': 'Demo <em>lesson</em>',
+    'course.demoText': 'Watch a short sample lesson to see how classes go.',
+    'course.about': 'About the course',
+    'course.program': 'Course <em>programme</em>',
+    'course.programText': 'Lessons follow in this order.',
+    'course.teachers': 'Course <em>teachers</em>',
+    'course.watch': 'Watch the video',
+    'course.missing': 'Course not found',
+    'course.missingText': 'This course was removed or has not been published yet.',
+    'course.error': 'Could not load the course. Please try again in a moment.',
+    'course.retry': 'Try again',
+  },
+};
+
+Object.keys(COURSE_PAGE).forEach((lang) => Object.assign(dict[lang], COURSE_PAGE[lang]));
+
+/* ---------- news from the API ---------- */
+const NEWS_PAGE = {
+  uz: { 'news.views': 'Ko‘rishlar' },
+  ru: { 'news.views': 'Просмотры' },
+  en: { 'news.views': 'Views' },
+};
+
+Object.keys(NEWS_PAGE).forEach((lang) => Object.assign(dict[lang], NEWS_PAGE[lang]));
+
+/* ---------- sign-up form → POST /api/leads ---------- */
+const LEAD_FORM = {
+  uz: {
+    'form.age': 'Yoshingiz',
+    'form.region': 'Viloyatingiz',
+    'form.errName': 'Ismingizni kiriting — faqat harflar.',
+    'form.errAge': 'Yoshingizni kiriting (3 dan 100 gacha).',
+    'form.errRegion': 'Viloyatingizni tanlang.',
+    'form.errServer': 'Arizani yuborib bo‘lmadi. Birozdan keyin qayta urinib ko‘ring.',
+    'form.errTooMany': 'Juda ko‘p ariza yuborildi. 10 daqiqadan keyin qayta urinib ko‘ring.',
+  },
+  ru: {
+    'form.age': 'Возраст',
+    'form.region': 'Регион',
+    'form.errName': 'Введите имя — только буквы.',
+    'form.errAge': 'Укажите возраст (от 3 до 100).',
+    'form.errRegion': 'Выберите регион.',
+    'form.errServer': 'Не удалось отправить заявку. Попробуйте чуть позже.',
+    'form.errTooMany': 'Слишком много заявок. Попробуйте через 10 минут.',
+  },
+  en: {
+    'form.age': 'Age',
+    'form.region': 'Region',
+    'form.errName': 'Enter your name — letters only.',
+    'form.errAge': 'Enter your age (3 to 100).',
+    'form.errRegion': 'Choose your region.',
+    'form.errServer': 'Could not send the request. Please try again in a moment.',
+    'form.errTooMany': 'Too many requests. Please try again in 10 minutes.',
+  },
+};
+
+Object.keys(LEAD_FORM).forEach((lang) => Object.assign(dict[lang], LEAD_FORM[lang]));

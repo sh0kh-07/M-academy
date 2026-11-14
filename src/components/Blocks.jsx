@@ -2,7 +2,8 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { useI18n } from '../i18n/index.jsx';
-import { CATS, COURSES } from '../data/courses.js';
+import { courseHref } from '../lib/catalog.js';
+import { mediaUrl, pick } from '../lib/http.js';
 import { reducedMotion } from '../lib/env.js';
 import Icon from './Icon.jsx';
 
@@ -113,15 +114,40 @@ export function Stats() {
   );
 }
 
-/**
- * Course cards. `indices` limits the list (home page); `filter` hides other categories.
- * Each card opens the sign-up page with that direction already chosen.
- */
-export function CourseGrid({ indices, filter = 'all' }) {
+const initials = (name) =>
+  name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0] ?? '')
+    .join('');
+
+/** What every course card shows: dimmed image (if any), number, glyph, category, name. */
+function CourseFace({ course, index }) {
   const { lang } = useI18n();
+  const name = pick(course.title, lang);
+  return (
+    <>
+      {course.image && <img className="course__img" src={mediaUrl(course.image)} alt="" loading="lazy" draggable={false} />}
+      <span className="course__num">{String(index + 1).padStart(2, '0')}</span>
+      <span className="course__arrow" aria-hidden="true">
+        <Icon name="arrowUpRight" />
+      </span>
+      <span className="course__glyph" aria-hidden="true">
+        {course.glyph || initials(name)}
+      </span>
+      <span className="course__cat">{course.catTitle ? pick(course.catTitle, lang) : '\u00a0'}</span>
+      <span className="course__name">{name}</span>
+    </>
+  );
+}
+
+/**
+ * Course cards from the catalogue (src/lib/catalog.js); `filter` hides other categories.
+ * A card opens the course page, or the sign-up page while the built-in list stands in.
+ */
+export function CourseGrid({ courses, filter = 'all' }) {
   const ref = useRef(null);
   const first = useRef(true);
-  const list = indices ?? COURSES.map((_, i) => i);
 
   useLayoutEffect(() => {
     if (first.current) {
@@ -140,25 +166,11 @@ export function CourseGrid({ indices, filter = 'all' }) {
 
   return (
     <div className="courses__grid" ref={ref}>
-      {list.map((i) => {
-        const course = COURSES[i];
+      {courses.map((course, i) => {
         const hidden = filter !== 'all' && course.cat !== filter;
         return (
-          <Link
-            key={i}
-            className={`course tilt${hidden ? ' is-hidden' : ''}`}
-            to={`/register?course=${i}`}
-            data-reveal=""
-          >
-            <span className="course__num">{String(i + 1).padStart(2, '0')}</span>
-            <span className="course__arrow" aria-hidden="true">
-              <Icon name="arrowUpRight" />
-            </span>
-            <span className="course__glyph" aria-hidden="true">
-              {course.g}
-            </span>
-            <span className="course__cat">{CATS[course.cat][lang]}</span>
-            <span className="course__name">{course[lang]}</span>
+          <Link key={course.id} className={`course tilt${hidden ? ' is-hidden' : ''}`} to={courseHref(course)} data-reveal="">
+            <CourseFace course={course} index={i} />
           </Link>
         );
       })}
@@ -168,10 +180,11 @@ export function CourseGrid({ indices, filter = 'all' }) {
 
 /**
  * The directions as a slowly turning 3D ring of cards (pure CSS 3D, one transform per frame).
- * Drag sideways to spin it; a card opens the sign-up page with that direction chosen.
+ * Drag sideways to spin it; a card opens that course. Give it a `key` that changes with the
+ * list — the ring measures its cards once when it mounts.
  */
-export function CourseRing() {
-  const { t, lang } = useI18n();
+export function CourseRing({ courses }) {
+  const { t } = useI18n();
   const stage = useRef(null);
   const track = useRef(null);
 
@@ -286,23 +299,15 @@ export function CourseRing() {
     <div className="ring" data-reveal="">
       <div className="ring__stage" ref={stage}>
         <div className="ring__track" ref={track}>
-          {COURSES.map((course, i) => (
+          {courses.map((course, i) => (
             <Link
-              key={i}
+              key={course.id}
               className="course ring__card"
-              to={`/register?course=${i}`}
+              to={courseHref(course)}
               draggable={false}
-              style={{ '--a': `${(360 / COURSES.length) * i}deg` }}
+              style={{ '--a': `${(360 / courses.length) * i}deg` }}
             >
-              <span className="course__num">{String(i + 1).padStart(2, '0')}</span>
-              <span className="course__arrow" aria-hidden="true">
-                <Icon name="arrowUpRight" />
-              </span>
-              <span className="course__glyph" aria-hidden="true">
-                {course.g}
-              </span>
-              <span className="course__cat">{CATS[course.cat][lang]}</span>
-              <span className="course__name">{course[lang]}</span>
+              <CourseFace course={course} index={i} />
             </Link>
           ))}
         </div>

@@ -1,4 +1,10 @@
 const PATHS = {
+  eye: (
+    <>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="2.8" />
+    </>
+  ),
   arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
   arrowUpRight: <path d="M7 17 17 7M9 7h8v8" />,
   arrowLeft: <path d="M19 12H5M11 6l-6 6 6 6" />,

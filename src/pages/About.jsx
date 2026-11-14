@@ -4,6 +4,7 @@ import { Cta, Eyebrow, Sample } from '../components/Blocks.jsx';
 import { Emblem } from '../components/Scenes.jsx';
 import Icon from '../components/Icon.jsx';
 import { COURSES } from '../data/courses.js';
+import TeacherCard, { useTeachers } from '../components/TeacherCard.jsx';
 
 const WHY = [
   { icon: 'cap', wide: true, deco: 'rings' },
@@ -13,7 +14,7 @@ const WHY = [
   { icon: 'award' },
 ];
 
-/** Placeholder mentor cards: course index + which "years of experience" line to show. */
+/** Placeholder mentor cards, shown until the first teacher is added in the admin panel. */
 const MENTORS = [
   { course: 0, exp: 'mentors.exp1' },
   { course: 1, exp: 'mentors.exp2' },
@@ -24,6 +25,8 @@ const MENTORS = [
 export default function About() {
   const { t, html, lang } = useI18n();
   usePage('title.about');
+  const teachers = useTeachers(); // null while loading
+  const live = Boolean(teachers?.length);
 
   return (
     <main>
@@ -85,7 +88,8 @@ export default function About() {
             </div>
           </header>
           <div className="mentors__grid">
-            {MENTORS.map(({ course, exp }) => (
+            {live && teachers.map((person) => <TeacherCard key={person.id} person={person} />)}
+            {teachers && !live && MENTORS.map(({ course, exp }) => (
               <article className="mentor tilt" data-reveal="" key={course}>
                 <div className="mentor__photo">
                   <Sample />
@@ -98,9 +102,11 @@ export default function About() {
               </article>
             ))}
           </div>
-          <p className="note" data-reveal="">
-            {t('mentors.note')}
-          </p>
+          {teachers && !live && (
+            <p className="note" data-reveal="">
+              {t('mentors.note')}
+            </p>
+          )}
         </div>
       </section>
 

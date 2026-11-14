@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import gsap from 'gsap';
 import { useI18n } from '../i18n/index.jsx';
@@ -6,19 +6,31 @@ import { usePage } from '../components/Layout.jsx';
 import { Cta, Eyebrow, Filters } from '../components/Blocks.jsx';
 import { PostCard, PostCover, PostMeta } from '../components/NewsParts.jsx';
 import Icon from '../components/Icon.jsx';
-import { NEWS_CATS, POSTS } from '../data/news.js';
+import { paragraphs } from '../data/news.js';
+import { pick } from '../lib/http.js';
+import { loadPost, useFeed } from '../lib/newsFeed.js';
 import { reducedMotion } from '../lib/env.js';
 
 /** /news — the feed: newest post large on top, the rest in a grid, filter by category. */
 export function News() {
-  const { t, html } = useI18n();
-  usePage('title.news');
+  const { t, html, lang } = useI18n();
+  // the curtain stays down until the posts are here, so the grid doesn't pop in
+  const ready = usePage('title.news', { autoReady: false });
+  const feed = useFeed();
   const [filter, setFilter] = useState('all');
   const grid = useRef(null);
   const first = useRef(true);
 
-  const cats = NEWS_CATS.filter((cat) => POSTS.some((post) => post.cat === cat));
-  const visible = POSTS.filter((post) => filter === 'all' || post.cat === filter);
+  useEffect(() => {
+    if (feed) ready();
+  }, [feed, ready]);
+
+  const posts = feed?.posts ?? [];
+  const visible = posts.filter((post) => filter === 'all' || post.cat === filter);
+  const options = [
+    ['all', t('news.all')],
+    ...(feed?.cats ?? []).map((cat) => [cat.key, cat.title ? pick(cat.title, lang) : t(`news.cat.${cat.key}`)]),
+  ];
 
   useLayoutEffect(() => {
     if (first.current) {
@@ -49,22 +61,18 @@ export function News() {
 
       <section className="section section--tight">
         <div className="container">
-          <Filters
-            value={filter}
-            onChange={setFilter}
-            options={[['all', t('news.all')], ...cats.map((cat) => [cat, t(`news.cat.${cat}`)])]}
-          />
+          {options.length > 2 && <Filters value={filter} onChange={setFilter} options={options} />}
           <div className="posts" ref={grid}>
-            {POSTS.map((post) => (
+            {posts.map((post) => (
               <PostCard
-                key={post.slug}
+                key={post.id}
                 post={post}
                 featured={filter === 'all' && post === visible[0]}
                 hidden={!visible.includes(post)}
               />
             ))}
           </div>
-          {POSTS.some((post) => post.sample) && (
+          {posts.some((post) => post.sample) && (
             <p className="note" data-reveal="">
               {t('news.note')}
             </p>
@@ -77,12 +85,30 @@ export function News() {
   );
 }
 
-/** /news/:slug — one post. */
+/** /news/:slug — one post, with three others under it. */
 export function NewsPost() {
   const { t, html, lang } = useI18n();
   const { slug } = useParams();
-  const post = POSTS.find((item) => item.slug === slug);
-  usePage('title.news', { title: post ? `${post[lang].title} — M.ACADEMY` : undefined });
+  const [state, setState] = useState({ loading: true, post: null, others: [] });
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    setState({ loading: true, post: null, others: [] });
+    loadPost(slug, ctrl.signal).then(
+      ({ post, others }) => setState({ loading: false, post, others }),
+      () => !ctrl.signal.aborted && setState({ loading: false, post: null, others: [] }),
+    );
+    return () => ctrl.abort();
+  }, [slug]);
+
+  const { post, others, loading } = state;
+  const title = post ? pick(post.title, lang) : '';
+  const ready = usePage('title.news', { autoReady: false, title: title ? `${title} — M.ACADEMY` : undefined });
+  useEffect(() => {
+    if (!loading) ready();
+  }, [loading, ready]);
+
+  if (loading) return <main className="article-page" />;
 
   if (!post) {
     return (
@@ -103,9 +129,6 @@ export function NewsPost() {
     );
   }
 
-  const text = post[lang];
-  const others = POSTS.filter((item) => item !== post).slice(0, 3);
-
   return (
     <main>
       <article className="article">
@@ -115,20 +138,20 @@ export function NewsPost() {
             <span>{t('news.back')}</span>
           </Link>
           <div data-reveal="">
-            <PostMeta post={post} minutes />
+            <PostMeta post={post} minutes views />
           </div>
           <h1 className="h1 article__title" data-reveal="">
-            {text.title}
+            {title}
           </h1>
           <p className="article__excerpt" data-reveal="">
-            {text.excerpt}
+            {pick(post.excerpt, lang)}
           </p>
           <div data-reveal="">
             <PostCover post={post} large />
           </div>
 
           <div className="article__body" data-reveal="">
-            {text.body.map((paragraph, i) => (
+            {paragraphs(post, lang).map((paragraph, i) => (
               <p key={i}>{paragraph}</p>
             ))}
           </div>
@@ -150,18 +173,20 @@ export function NewsPost() {
         </div>
       </article>
 
-      <section className="section">
-        <div className="container">
-          <header className="section__head">
-            <h2 className="h2" data-reveal="" {...html('news.more')} />
-          </header>
-          <div className="posts">
-            {others.map((item) => (
-              <PostCard post={item} key={item.slug} />
-            ))}
+      {others.length > 0 && (
+        <section className="section">
+          <div className="container">
+            <header className="section__head">
+              <h2 className="h2" data-reveal="" {...html('news.more')} />
+            </header>
+            <div className="posts">
+              {others.map((item) => (
+                <PostCard post={item} key={item.id} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <Cta />
     </main>

@@ -4,6 +4,7 @@ import { LANGS, useI18n } from '../i18n/index.jsx';
 import { CONFIG } from '../data/courses.js';
 import { reducedMotion } from '../lib/env.js';
 import { lockScroll, scrollToTop, unlockScroll } from '../lib/scroll.js';
+import { postJSON } from '../lib/http.js';
 import { usePointerFx, useReveal } from '../hooks/usePageFx.js';
 import Cursor from './Cursor.jsx';
 
@@ -200,6 +201,13 @@ export default function Layout({ children }) {
     update();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // page views for the admin statistics: POST /api/visits { path } (no query string).
+  // Production build only, so local work and testing don't count as visits.
+  useEffect(() => {
+    if (!import.meta.env.PROD) return;
+    postJSON('/visits', { path: shown.pathname.slice(0, 300) }, { keepalive: true }).catch(() => {});
+  }, [shown.pathname]);
 
   useReveal(shown.key);
   usePointerFx();

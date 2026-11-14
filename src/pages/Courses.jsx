@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
 import { usePage } from '../components/Layout.jsx';
 import { CourseGrid, Cta, Eyebrow, Filters } from '../components/Blocks.jsx';
 import { LearningPath } from '../components/Scenes.jsx';
+import { useCatalog } from '../lib/catalog.js';
+import { pick } from '../lib/http.js';
 
 export default function Courses() {
-  const { t, html } = useI18n();
-  usePage('title.courses');
+  const { t, html, lang } = useI18n();
+  // keep the curtain down until the catalogue is here, so the grid doesn't pop in
+  const ready = usePage('title.courses', { autoReady: false });
+  const catalog = useCatalog();
   const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    if (catalog) ready();
+  }, [catalog, ready]);
+
+  const options = [
+    ['all', t('courses.all')],
+    ...(catalog?.cats ?? []).map((cat) => [cat.key, cat.title ? pick(cat.title, lang) : t(`courses.${cat.key}`)]),
+  ];
 
   return (
     <main>
@@ -23,17 +36,12 @@ export default function Courses() {
 
       <section className="section section--tight courses">
         <div className="container">
-          <Filters
-            value={filter}
-            onChange={setFilter}
-            options={[
-              ['all', t('courses.all')],
-              ['lang', t('courses.lang')],
-              ['exact', t('courses.exact')],
-              ['social', t('courses.social')],
-            ]}
-          />
-          <CourseGrid filter={filter} />
+          {catalog && (
+            <>
+              {options.length > 2 && <Filters value={filter} onChange={setFilter} options={options} />}
+              <CourseGrid courses={catalog.courses} filter={filter} />
+            </>
+          )}
         </div>
       </section>
 

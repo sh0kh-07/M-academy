@@ -16,33 +16,55 @@ import { finePointer, reducedMotion } from '../lib/env.js';
   className and would wipe a class it did not render.
 */
 
-/** Re-scan the page for [data-reveal] elements whenever `key` changes (i.e. on every route). */
+/**
+ * Watch [data-reveal] elements: on every route (`key`), and also ones that appear later —
+ * content that arrives from the API after the page has mounted.
+ */
 export function useReveal(key) {
   useEffect(() => {
-    const items = [...document.querySelectorAll('[data-reveal]:not([data-in])')];
-    const counts = new Map();
-    items.forEach((el) => {
-      const parent = el.parentElement;
-      const i = counts.get(parent) ?? 0;
-      counts.set(parent, i + 1);
-      el.style.setProperty('--d', `${Math.min(i, 8) * 0.07}s`);
-    });
+    const seen = new WeakSet();
+    const io =
+      reducedMotion || !('IntersectionObserver' in window)
+        ? null
+        : new IntersectionObserver(
+            (entries) =>
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.setAttribute('data-in', '');
+                io.unobserve(entry.target);
+              }),
+            { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+          );
 
-    if (reducedMotion || !('IntersectionObserver' in window)) {
-      items.forEach((el) => el.setAttribute('data-in', ''));
-      return undefined;
-    }
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.setAttribute('data-in', '');
-          io.unobserve(entry.target);
-        }),
-      { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
-    );
-    items.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    const scan = () => {
+      const items = [...document.querySelectorAll('[data-reveal]:not([data-in])')].filter((el) => !seen.has(el));
+      const counts = new Map();
+      items.forEach((el) => {
+        seen.add(el);
+        const parent = el.parentElement;
+        const i = counts.get(parent) ?? 0;
+        counts.set(parent, i + 1);
+        el.style.setProperty('--d', `${Math.min(i, 8) * 0.07}s`);
+        if (io) io.observe(el);
+        else el.setAttribute('data-in', '');
+      });
+    };
+    scan();
+
+    let queued = false;
+    const mo = new MutationObserver(() => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        scan();
+      });
+    });
+    mo.observe(document.getElementById('root') ?? document.body, { childList: true, subtree: true });
+    return () => {
+      mo.disconnect();
+      io?.disconnect();
+    };
   }, [key]);
 }
 

@@ -1284,6 +1284,25 @@ svg {
   letter-spacing: -0.01em;
 }
 
+/* an uploaded course image: a dim backdrop that fades out behind the glyph and name */
+.course__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  opacity: 0.32;
+  -webkit-mask-image: linear-gradient(170deg, #000 10%, rgba(0, 0, 0, 0.5) 50%, transparent 88%);
+  mask-image: linear-gradient(170deg, #000 10%, rgba(0, 0, 0, 0.5) 50%, transparent 88%);
+  pointer-events: none;
+  user-select: none;
+}
+
+.course__img ~ :not(.course__arrow) {
+  position: relative;
+}
+
 /* ---------- why / bento ---------- */
 .bento {
   display: grid;
@@ -2251,6 +2270,41 @@ svg {
   transition: translate 0.7s var(--ease);
 }
 
+/* a post with an uploaded picture: the photo under a soft fade, drifting a little with the tilt */
+.cover--photo {
+  background: #070b1a;
+}
+
+.cover--photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scale: 1.06;
+  translate: calc(var(--px, 0) * -12px) calc(var(--py, 0) * -8px);
+  transition: translate 0.7s var(--ease);
+}
+
+.cover--photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(5, 7, 15, 0) 45%, rgba(5, 7, 15, 0.55));
+  pointer-events: none;
+}
+
+.post__views {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.post__views svg {
+  width: 1.05em;
+  height: 1.05em;
+}
+
 /* ---------- one post ---------- */
 .article {
   position: relative;
@@ -3202,6 +3256,60 @@ svg {
   transform: scaleX(1);
 }
 
+.field-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.4fr) minmax(0, 1fr);
+  gap: 0.8rem;
+}
+
+/* the region dropdown looks like the other fields; its label floats once a region is chosen */
+.field select {
+  width: 100%;
+  padding: 1.55rem 2.6rem 0.65rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid var(--line-2);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9b26a' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9.5 6 6 6-6'/%3E%3C/svg%3E")
+      right 1rem center / 1rem no-repeat,
+    rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: 500 1.05rem/1.3 var(--font-body);
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.field select:focus {
+  outline: none;
+  border-color: rgba(217, 178, 106, 0.55);
+}
+
+.field select option {
+  background: #0b1124;
+  color: var(--text);
+}
+
+.field select:focus + span,
+.field select[data-filled] + span {
+  transform: translateY(-0.62rem) scale(0.7);
+  color: var(--gold);
+}
+
+.field select:focus ~ i {
+  transform: scaleX(1);
+}
+
+/* no spinner arrows on the age field */
+.field input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.field input[type='number']::-webkit-inner-spin-button,
+.field input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .reg__error {
   margin-top: 1rem;
   color: #ff9d8a;
@@ -3520,5 +3628,249 @@ svg {
     opacity: 1;
     translate: 0 0;
     rotate: none !important;
+  }
+}
+
+/* ==================================================================
+   COURSE PAGE (/courses/:slug)
+   ================================================================== */
+.course-page {
+  min-height: 100vh;
+}
+
+.course-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+
+.course-hero .link-back {
+  display: flex;
+  width: fit-content;
+  margin-bottom: 1.6rem;
+}
+
+.course-hero__title {
+  margin-top: 1rem;
+}
+
+.course-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem clamp(1.4rem, 3vw, 2.6rem);
+  margin-top: 2rem;
+}
+
+.course-meta > div {
+  padding-left: 1rem;
+  border-left: 1px solid var(--line);
+}
+
+.course-meta dt {
+  font: 500 0.55rem/1 var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.course-meta dd {
+  margin-top: 0.55rem;
+  font: 500 1.05rem/1.2 var(--font-display);
+}
+
+.course-hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 2.2rem;
+}
+
+.course-hero__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-2);
+  background:
+    radial-gradient(90% 70% at 30% 0%, rgba(42, 74, 170, 0.32), transparent 70%),
+    linear-gradient(160deg, #0d1530, #060913);
+}
+
+.course-hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.course-hero__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(5, 7, 15, 0.55));
+  pointer-events: none;
+}
+
+.course-hero__glyph {
+  font: 500 clamp(6rem, 16vw, 12rem) / 1 var(--font-serif);
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.course-narrow {
+  width: min(960px, 100% - var(--gutter) * 2);
+}
+
+.course-narrow > .h2 + .article__body {
+  margin-top: 1.6rem;
+}
+
+.course-video {
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-2);
+  background: #000;
+}
+
+.course-video video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+/* lessons: an accordion; a YouTube lesson plays inline once opened */
+.lessons {
+  border-top: 1px solid var(--line-2);
+}
+
+.lesson {
+  border-bottom: 1px solid var(--line-2);
+}
+
+.lesson__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.4vw, 2rem);
+  padding: clamp(1.1rem, 2vw, 1.5rem) 0.2rem;
+  text-align: left;
+}
+
+.lesson__head:disabled {
+  cursor: default;
+}
+
+.lesson__num {
+  flex: none;
+  min-width: 2.2rem;
+  font: 500 clamp(1.4rem, 2.2vw, 1.9rem) / 1 var(--font-serif);
+  color: var(--gold);
+}
+
+.lesson__title {
+  flex: 1;
+  font: 500 clamp(0.95rem, 1.4vw, 1.12rem) / 1.35 var(--font-display);
+  letter-spacing: -0.01em;
+  transition: color 0.3s;
+}
+
+.lesson__head:not(:disabled):hover .lesson__title {
+  color: var(--gold-l);
+}
+
+.lesson__toggle {
+  flex: none;
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  color: var(--muted);
+  transition:
+    rotate 0.5s var(--ease),
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s;
+}
+
+.lesson__toggle svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  stroke-width: 2;
+}
+
+.lesson[data-open] .lesson__toggle {
+  rotate: 90deg;
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1a1204;
+}
+
+.lesson__body {
+  display: grid;
+  gap: 1rem;
+  padding: 0 0 clamp(1.4rem, 3vw, 2rem) calc(2.2rem + clamp(1rem, 2.4vw, 2rem));
+  color: rgba(226, 230, 241, 0.86);
+  line-height: 1.75;
+}
+
+.lesson__body .link-arrow {
+  justify-self: start;
+}
+
+.lesson__video {
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid var(--line-2);
+  background: #000;
+}
+
+.lesson__video iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+
+.mentor .mentor__note {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(152, 161, 184, 0.8);
+}
+
+/* a teacher with a real photo: the drawn silhouette steps aside */
+.mentor__photo--img::before,
+.mentor__photo--img::after {
+  display: none;
+}
+
+.mentor__photo--img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .course-hero__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .course-hero__media {
+    aspect-ratio: 16 / 10;
+  }
+
+  .lesson__body {
+    padding-left: 0;
   }
 }
