@@ -13,6 +13,7 @@ import { reducedMotion, wait } from '../lib/env.js';
 import { FALLBACK, useCatalog } from '../lib/catalog.js';
 import { useFeed } from '../lib/newsFeed.js';
 import { pick } from '../lib/http.js';
+import { FounderSection } from './Founder.jsx';
 import { lockScroll, scrollToElement, unlockScroll } from '../lib/scroll.js';
 
 /** The logo preloader is shown once per browser session, on the first visit to the home page. */
@@ -268,6 +269,9 @@ export default function Home() {
           <Features />
         </div>
       </section>
+
+      {/* ============ FOUNDER (from the admin panel; hidden until filled in) ============ */}
+      <FounderSection />
 
       {/* ============ COURSES (preview) ============ */}
       <section className="section courses">

@@ -207,3 +207,93 @@ export function FounderTeaser() {
     </section>
   );
 }
+
+/**
+ * The founder on the home page: photo in front of the gold M, name, titles, the start of
+ * the story, the highlight cards and the quote, with a link to the full page.
+ * Hidden while there is no founder page.
+ */
+export function FounderSection() {
+  const { t, lang } = useI18n();
+  const data = useFounder();
+  if (!data) return null;
+
+  const name = pick(data.full_name, lang);
+  const [first, last] = splitName(name);
+  const titles = (data.titles ?? []).map((x) => pick(x, lang)).filter(Boolean);
+  const highlights = (data.highlights ?? []).filter((h) => pick(h.title, lang));
+  const bio = pick(data.bio, lang).split(/\n{2,}/)[0];
+  const quote = pick(data.quote, lang);
+
+  return (
+    <section className="section founder-home">
+      <span className="founder__band founder__band--a" aria-hidden="true" />
+      <div className="container founder__grid">
+        <div className="founder__visual tilt" data-tilt="0.35" data-reveal="">
+          <img className="founder__mark" src="/img/logo-mark.webp" alt="" width="543" height="531" loading="lazy" />
+          <span className="founder__glow" aria-hidden="true" />
+          {data.image ? (
+            <img className="founder__photo" src={mediaUrl(data.image)} alt={name} loading="lazy" />
+          ) : (
+            <span className="founder__photo founder__photo--empty" aria-hidden="true" />
+          )}
+        </div>
+
+        <div className="founder__copy">
+          <p className="eyebrow" data-reveal="">
+            <span className="eyebrow__line" />
+            <span>{t('founder.eyebrow')}</span>
+          </p>
+          <h2 className="founder__name" data-reveal="">
+            {first && <span>{first} </span>}
+            <em>{last}</em>
+          </h2>
+          {titles.length > 0 && (
+            <ul className="founder__titles" data-reveal="">
+              {titles.map((title, i) => (
+                <li key={i}>{title}</li>
+              ))}
+            </ul>
+          )}
+          {bio && (
+            <div className="founder__bio founder__bio--short" data-reveal="">
+              <p>{bio}</p>
+            </div>
+          )}
+
+          {highlights.length > 0 && (
+            <ul className="founder__highlights">
+              {highlights.map((h, i) => (
+                <li className="founder__chip tilt" data-tilt="0.6" data-reveal="" key={i}>
+                  <FounderIcon name={h.icon} />
+                  <span>
+                    <b>{pick(h.title, lang)}</b>
+                    {pick(h.subtitle, lang) && <small>{pick(h.subtitle, lang)}</small>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {quote && (
+            <figure className="founder__quote" data-reveal="">
+              <span className="founder__qmark" aria-hidden="true">
+                “
+              </span>
+              <blockquote>{quote}</blockquote>
+              <figcaption>
+                {data.signature && <img src={mediaUrl(data.signature)} alt="" loading="lazy" />}
+                <span>{name}</span>
+              </figcaption>
+            </figure>
+          )}
+
+          <Link className="btn btn--ghost magnetic founder-home__more" to="/about/founder" data-reveal="">
+            <span>{t('founder.more')}</span>
+            <Icon name="arrow" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}

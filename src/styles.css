@@ -3135,6 +3135,41 @@ body.menu-open .music {
   color: rgba(238, 240, 247, 0.8);
 }
 
+/* ---------- the founder on the home page ---------- */
+.founder-home {
+  overflow: clip;
+  isolation: isolate;
+  background:
+    radial-gradient(40% 60% at 22% 50%, rgba(217, 178, 106, 0.1), transparent 70%),
+    radial-gradient(45% 55% at 85% 30%, rgba(42, 74, 170, 0.14), transparent 70%);
+}
+
+.founder-home .founder__band--a {
+  top: -60%;
+}
+
+.founder-home .founder__name {
+  margin-top: 1.2rem;
+}
+
+/* the home page shows the opening paragraph only */
+.founder__bio--short p {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.founder-home__more {
+  margin-top: clamp(1.4rem, 3vw, 2rem);
+}
+
+@media (max-width: 900px) {
+  .founder-home .founder__copy {
+    order: 0;
+  }
+}
+
 /* ---------- teaser on the Academy page ---------- */
 .founder-teaser__card {
   display: grid;
