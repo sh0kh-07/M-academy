@@ -7,7 +7,7 @@ import react from '@vitejs/plugin-react';
 // Backend (NestJS, docs at /api/docs). In dev and preview the app calls /api on its own
 // origin and Vite forwards it there, so CORS and the refresh-token cookie just work.
 // To point at another backend: API_TARGET=https://… npm run dev
-const API_TARGET = process.env.API_TARGET || 'https://dev-m-academy.udsgroup.uz';
+const API_TARGET = process.env.API_TARGET || 'https://dev.m-academy.uz';
 
 const forward = {
   target: API_TARGET,

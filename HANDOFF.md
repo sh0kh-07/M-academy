@@ -103,7 +103,7 @@ src/
 
 ## Админ-панель (`/admin`)
 
-Бэкенд: NestJS, `https://dev-m-academy.udsgroup.uz/api` (Swagger `/api/docs` закрыт basic-auth; разделы пользователь присылает текстом).
+Бэкенд: NestJS, `https://dev.m-academy.uz/api` (Swagger `/api/docs` закрыт basic-auth; разделы пользователь присылает текстом).
 Ошибки приходят как `{ statusCode, error, message }`, `message` — строка или массив (валидация).
 
 - `src/admin/` — отдельный бандл, грузится лениво только на `/admin` (`App.jsx`). Стили `admin.css`, всё под `.adm`.
