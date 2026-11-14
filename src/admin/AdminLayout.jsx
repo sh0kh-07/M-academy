@@ -35,7 +35,10 @@ const NAV = [
   },
   {
     label: 'nav.groupSite',
-    items: [{ to: '/admin/music', key: 'nav.music', icon: 'music' }],
+    items: [
+      { to: '/admin/founder', key: 'nav.founder', icon: 'user' },
+      { to: '/admin/music', key: 'nav.music', icon: 'music' },
+    ],
   },
   {
     label: 'nav.account',
@@ -58,6 +61,7 @@ const CRUMBS = [
   ['/admin/categories', 'cats.title'],
   ['/admin/teachers', 'nav.teachers'],
   ['/admin/music', 'nav.music'],
+  ['/admin/founder', 'nav.founder'],
   ['/admin/profile', 'nav.profile'],
 ];
 const crumb = (path) => CRUMBS.find(([prefix]) => path.startsWith(prefix))?.[1] ?? 'nav.dashboard';

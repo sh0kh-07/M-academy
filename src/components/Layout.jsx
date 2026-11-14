@@ -84,6 +84,7 @@ function Footer() {
         <nav className="footer__col">
           <b>{t('footer.nav')}</b>
           <Link to="/about">{t('nav.about')}</Link>
+          <Link to="/about/founder">{t('founder.crumb')}</Link>
           <Link to="/courses">{t('nav.courses')}</Link>
           <Link to="/results">{t('nav.results')}</Link>
           <Link to="/news">{t('nav.news')}</Link>

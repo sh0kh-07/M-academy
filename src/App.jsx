@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import Home from './pages/Home.jsx';
 import About from './pages/About.jsx';
+import Founder from './pages/Founder.jsx';
 import Courses from './pages/Courses.jsx';
 import CoursePage from './pages/CoursePage.jsx';
 import Results from './pages/Results.jsx';
@@ -20,6 +21,7 @@ function Site() {
     <Layout>
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
+      <Route path="/about/founder" element={<Founder />} />
       <Route path="/courses" element={<Courses />} />
       <Route path="/courses/:slug" element={<CoursePage />} />
       <Route path="/results" element={<Results />} />

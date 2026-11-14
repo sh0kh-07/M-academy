@@ -5,6 +5,7 @@ import { Emblem } from '../components/Scenes.jsx';
 import Icon from '../components/Icon.jsx';
 import { COURSES } from '../data/courses.js';
 import TeacherCard, { useTeachers } from '../components/TeacherCard.jsx';
+import { FounderTeaser } from './Founder.jsx';
 
 const WHY = [
   { icon: 'cap', wide: true, deco: 'rings' },
@@ -50,6 +51,8 @@ export default function About() {
           <Emblem />
         </div>
       </section>
+
+      <FounderTeaser />
 
       <section className="section why">
         <div className="container">

@@ -651,3 +651,29 @@ const MUSIC = {
   en: { 'music.on': 'Turn music on', 'music.off': 'Turn music off' },
 };
 Object.keys(MUSIC).forEach((lang) => Object.assign(dict[lang], MUSIC[lang]));
+
+/* ---------- founder page ---------- */
+const FOUNDER = {
+  uz: {
+    'title.founder': 'Asoschi — M.ACADEMY',
+    'founder.crumb': 'Asoschisi',
+    'founder.eyebrow': 'M.ACADEMY asoschisi',
+    'founder.more': 'Asoschi haqida',
+    'founder.missing': 'Bu sahifa tez orada to‘ldiriladi.',
+  },
+  ru: {
+    'title.founder': 'Основатель — M.ACADEMY',
+    'founder.crumb': 'Основатель',
+    'founder.eyebrow': 'Основатель M.ACADEMY',
+    'founder.more': 'Об основателе',
+    'founder.missing': 'Эта страница скоро появится.',
+  },
+  en: {
+    'title.founder': 'Founder — M.ACADEMY',
+    'founder.crumb': 'Founder',
+    'founder.eyebrow': 'Founder of M.ACADEMY',
+    'founder.more': 'About the founder',
+    'founder.missing': 'This page is coming soon.',
+  },
+};
+Object.keys(FOUNDER).forEach((lang) => Object.assign(dict[lang], FOUNDER[lang]));

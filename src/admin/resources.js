@@ -237,3 +237,14 @@ export const music = {
   /** deletes the track and its audio / cover files */
   remove: (id) => api(`/admin/music/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 };
+
+/* ---------------- founder page ---------------- */
+
+/**
+ * "Akademiya → Asoschisi" (Swagger "Admin · Asoschi"). One page: get() answers null
+ * until it is filled in; save() creates or replaces it whole (PUT), so send every field.
+ */
+export const founder = {
+  get: (signal) => api('/admin/founder', { signal }),
+  save: (body) => api('/admin/founder', { method: 'PUT', body }),
+};
