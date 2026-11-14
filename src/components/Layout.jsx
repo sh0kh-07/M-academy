@@ -9,6 +9,7 @@ import { usePointerFx, useReveal } from '../hooks/usePageFx.js';
 import Cursor from './Cursor.jsx';
 import MusicPlayer from './MusicPlayer.jsx';
 import { useFounder } from '../lib/founder.js';
+import { startUiSounds } from '../lib/uiSound.js';
 
 const PageContext = createContext({ ready: () => {} });
 
@@ -213,6 +214,7 @@ export default function Layout({ children }) {
 
   useReveal(shown.key);
   usePointerFx();
+  useEffect(startUiSounds, []); // soft tick on hover, click on press
 
   return (
     <PageContext.Provider value={{ ready }}>
