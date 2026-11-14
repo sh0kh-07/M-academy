@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
+import { cue } from '../lib/uiSound.js';
 import { useI18n } from '../i18n/index.jsx';
 import { courseHref } from '../lib/catalog.js';
 import { mediaUrl, pick } from '../lib/http.js';
@@ -322,6 +323,14 @@ export function CourseRing({ courses }) {
       }
       apply();
       sky.draw(state.angle, dt);
+      // like an iPhone picker: a detent tick each time a card passes the front, while spun by hand
+      const front = Math.round(-state.angle / (360 / count));
+      if (front !== state.front) {
+        if (state.front !== undefined && (state.dragging || Math.abs(state.velocity) > 12)) {
+          cue('detent', { index: ((front % count) + count) % count });
+        }
+        state.front = front;
+      }
       frame = requestAnimationFrame(tick);
     };
     const run = (on) => {

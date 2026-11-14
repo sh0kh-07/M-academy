@@ -9,7 +9,7 @@ import { usePointerFx, useReveal } from '../hooks/usePageFx.js';
 import Cursor from './Cursor.jsx';
 import MusicPlayer from './MusicPlayer.jsx';
 import { useFounder } from '../lib/founder.js';
-import { startUiSounds } from '../lib/uiSound.js';
+import { cue, startUiSounds } from '../lib/uiSound.js';
 
 const PageContext = createContext({ ready: () => {} });
 
@@ -147,6 +147,7 @@ export default function Layout({ children }) {
       return undefined;
     }
     setCovered(true);
+    cue('whoosh'); // the screen dips to black
     const id = setTimeout(
       () => {
         setShown(location);
