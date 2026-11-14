@@ -53,40 +53,6 @@ export const NEWS = [
     },
   },
   {
-    slug: 'nigina-yordamchi',
-    date: '2026-11-03',
-    cat: 'tech',
-    glyph: 'AI',
-    sample: true,
-    uz: {
-      title: 'NIGINA: aqlli yordamchi ustida ish davom etmoqda',
-      excerpt: 'Sun’iy intellektga asoslangan o‘quv yordamchimiz qanday bo‘lishi haqida qisqacha.',
-      body: [
-        'NIGINA — M.ACADEMY’ning sun’iy intellektga asoslangan o‘quv yordamchisi. Hozirda u ishlab chiqish bosqichida.',
-        'Rejaga ko‘ra, NIGINA o‘quvchilarning savollariga javob beradi, mashqlarni tushuntiradi va har bir o‘quvchiga shaxsiy tavsiyalar beradi. Muloqot uch tilda — o‘zbek, rus va ingliz tillarida bo‘ladi.',
-        'Yordamchi tayyor bo‘lishi bilan bu haqda shu sahifada xabar beramiz.',
-      ],
-    },
-    ru: {
-      title: 'NIGINA: работа над умным помощником продолжается',
-      excerpt: 'Коротко о том, каким будет наш учебный помощник на базе искусственного интеллекта.',
-      body: [
-        'NIGINA — учебный помощник M.ACADEMY на базе искусственного интеллекта. Сейчас он находится в разработке.',
-        'По плану NIGINA будет отвечать на вопросы учеников, объяснять упражнения и давать каждому личные рекомендации. Общаться с ней можно будет на трёх языках — узбекском, русском и английском.',
-        'Как только помощник будет готов, мы сообщим об этом на этой странице.',
-      ],
-    },
-    en: {
-      title: 'NIGINA: work on the smart assistant continues',
-      excerpt: 'A short note on what our AI-powered study assistant will be.',
-      body: [
-        'NIGINA is M.ACADEMY’s AI-powered study assistant. It is currently in development.',
-        'The plan is for NIGINA to answer students’ questions, explain exercises and give each student personal recommendations. It will work in three languages — Uzbek, Russian and English.',
-        'We will announce it on this page as soon as the assistant is ready.',
-      ],
-    },
-  },
-  {
     slug: 'ielts-guruhlari',
     date: '2026-10-27',
     cat: 'course',

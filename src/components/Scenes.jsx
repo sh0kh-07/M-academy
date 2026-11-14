@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useI18n } from '../i18n/index.jsx';
-import { reducedMotion, wait } from '../lib/env.js';
+import { reducedMotion } from '../lib/env.js';
 import { getLenis } from '../lib/scroll.js';
 import { COURSES } from '../data/courses.js';
 import { PLACES } from '../data/places.js';
@@ -226,96 +226,6 @@ export function LearningPath() {
         </div>
       </div>
     </section>
-  );
-}
-
-/** A scripted demo conversation with NIGINA that types itself out while it is on screen. */
-export function NiginaChat() {
-  const { t, lang } = useI18n();
-  const chat = useRef(null);
-  const body = useRef(null);
-
-  useEffect(() => {
-    const box = body.current;
-    let run = 0;
-    let visible = false;
-
-    const bubble = (who) => {
-      const el = document.createElement('div');
-      el.className = `bubble bubble--${who}`;
-      box.append(el);
-      while (box.children.length > 4) box.firstElementChild.remove();
-      return el;
-    };
-
-    async function play() {
-      const id = ++run;
-      const alive = () => id === run && visible;
-      box.innerHTML = '';
-      const script = [
-        ['user', t('chat.q')],
-        ['ai', t('chat.a')],
-        ['user', t('chat.q2')],
-        ['ai', t('chat.a2')],
-      ];
-
-      if (reducedMotion) {
-        script.slice(0, 2).forEach(([who, text]) => (bubble(who).textContent = text));
-        return;
-      }
-      for (const [who, text] of script) {
-        if (who === 'ai') {
-          const typing = bubble('ai');
-          typing.classList.add('bubble--typing');
-          typing.innerHTML = '<i></i><i></i><i></i>';
-          await wait(1100);
-          if (!alive()) return;
-          typing.remove();
-        }
-        const el = bubble(who);
-        for (const ch of text) {
-          el.textContent += ch;
-          await wait(who === 'user' ? 34 : 16);
-          if (!alive()) return;
-        }
-        await wait(900);
-        if (!alive()) return;
-      }
-      await wait(4200);
-      if (alive()) play();
-    }
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        visible = entry.isIntersecting;
-        if (visible) play();
-        else run++;
-      },
-      { threshold: 0.35 },
-    );
-    io.observe(chat.current);
-    return () => {
-      visible = false;
-      run++;
-      io.disconnect();
-    };
-    // restart the script when the language changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang]);
-
-  return (
-    <div className="chat" ref={chat} aria-hidden="true">
-      <div className="chat__head">
-        <i />
-        <b>NIGINA</b>
-        <small>{t('nigina.demo')}</small>
-      </div>
-      <div className="chat__body" ref={body} />
-      <div className="chat__input">
-        <span>{t('nigina.placeholder')}</span>
-        <i />
-      </div>
-    </div>
   );
 }
 

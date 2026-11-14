@@ -8,6 +8,7 @@ import { postJSON } from '../lib/http.js';
 import { usePointerFx, useReveal } from '../hooks/usePageFx.js';
 import Cursor from './Cursor.jsx';
 import MusicPlayer from './MusicPlayer.jsx';
+import { useFounder } from '../lib/founder.js';
 
 const PageContext = createContext({ ready: () => {} });
 
@@ -35,7 +36,6 @@ const NAV = [
   { to: '/courses', key: 'nav.courses' },
   { to: '/results', key: 'nav.results' },
   { to: '/news', key: 'nav.news' },
-  { to: '/nigina', label: 'NIGINA' },
 ];
 
 const current = ({ isActive }) => (isActive ? 'is-current' : undefined);
@@ -61,6 +61,7 @@ function LangSwitch() {
 
 function Footer() {
   const { t } = useI18n();
+  const founder = useFounder(); // the link appears once the founder page is filled in
   const social = (name, label) => {
     const url = CONFIG[name];
     return url && url !== '#' ? (
@@ -84,11 +85,10 @@ function Footer() {
         <nav className="footer__col">
           <b>{t('footer.nav')}</b>
           <Link to="/about">{t('nav.about')}</Link>
-          <Link to="/about/founder">{t('founder.crumb')}</Link>
+          {founder && <Link to="/about/founder">{t('founder.crumb')}</Link>}
           <Link to="/courses">{t('nav.courses')}</Link>
           <Link to="/results">{t('nav.results')}</Link>
           <Link to="/news">{t('nav.news')}</Link>
-          <Link to="/nigina">NIGINA</Link>
           <Link to="/register">{t('cta.signup')}</Link>
         </nav>
         <nav className="footer__col">

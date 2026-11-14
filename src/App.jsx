@@ -7,7 +7,6 @@ import Founder from './pages/Founder.jsx';
 import Courses from './pages/Courses.jsx';
 import CoursePage from './pages/CoursePage.jsx';
 import Results from './pages/Results.jsx';
-import Nigina from './pages/Nigina.jsx';
 import { News, NewsPost } from './pages/News.jsx';
 import Register from './pages/Register.jsx';
 import NotFound from './pages/NotFound.jsx';
@@ -27,7 +26,6 @@ function Site() {
       <Route path="/results" element={<Results />} />
       <Route path="/news" element={<News />} />
       <Route path="/news/:slug" element={<NewsPost />} />
-      <Route path="/nigina" element={<Nigina />} />
       <Route path="/register" element={<Register />} />
       <Route path="*" element={<NotFound />} />
     </Layout>
