@@ -219,3 +219,21 @@ export function changes(before, after) {
   });
   return out;
 }
+
+/* ---------------- music ---------------- */
+
+/**
+ * Site background music (Swagger "Admin · Musiqa"). Upload the audio with
+ * upload('audio', file) and the cover with upload('image', file), then send the paths.
+ * The site plays the active tracks in sort_order.
+ */
+export const music = {
+  list: (signal) => api('/admin/music', { signal }).then((d) => byOrder(records(d))),
+  get: (id, signal) => api(`/admin/music/${encodeURIComponent(id)}`, { signal }),
+  /** { title, artist?, file, cover?, duration_seconds?, sort_order?, is_active? } */
+  create: (body) => api('/admin/music', { method: 'POST', body }),
+  /** only the fields sent change; replacing file / cover deletes the old one on the server */
+  update: (id, body) => api(`/admin/music/${encodeURIComponent(id)}`, { method: 'PATCH', body }),
+  /** deletes the track and its audio / cover files */
+  remove: (id) => api(`/admin/music/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+};

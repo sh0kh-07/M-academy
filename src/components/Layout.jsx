@@ -7,6 +7,7 @@ import { lockScroll, scrollToTop, unlockScroll } from '../lib/scroll.js';
 import { postJSON } from '../lib/http.js';
 import { usePointerFx, useReveal } from '../hooks/usePageFx.js';
 import Cursor from './Cursor.jsx';
+import MusicPlayer from './MusicPlayer.jsx';
 
 const PageContext = createContext({ ready: () => {} });
 
@@ -216,6 +217,7 @@ export default function Layout({ children }) {
     <PageContext.Provider value={{ ready }}>
       <div className={`curtain${covered ? ' is-on' : ''}`} aria-hidden="true" />
       <Cursor />
+      <MusicPlayer />
       <div className="scroll-progress" aria-hidden="true">
         <span ref={barRef} />
       </div>

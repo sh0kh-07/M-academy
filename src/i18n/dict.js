@@ -643,3 +643,11 @@ const LEAD_FORM = {
 };
 
 Object.keys(LEAD_FORM).forEach((lang) => Object.assign(dict[lang], LEAD_FORM[lang]));
+
+/* ---------- background music button ---------- */
+const MUSIC = {
+  uz: { 'music.on': 'Musiqani yoqish', 'music.off': 'Musiqani o‘chirish' },
+  ru: { 'music.on': 'Включить музыку', 'music.off': 'Выключить музыку' },
+  en: { 'music.on': 'Turn music on', 'music.off': 'Turn music off' },
+};
+Object.keys(MUSIC).forEach((lang) => Object.assign(dict[lang], MUSIC[lang]));

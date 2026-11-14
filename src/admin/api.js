@@ -270,7 +270,7 @@ function xhrUpload(path, file, token, onProgress, signal) {
 }
 
 /**
- * POST /uploads/image or /uploads/video (multipart, field "file").
+ * POST /uploads/image, /uploads/video or /uploads/audio (multipart, field "file").
  * Resolves to the stored path, e.g. "/uploads/images/….webp".
  */
 export async function upload(kind, file, { onProgress, signal } = {}) {

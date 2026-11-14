@@ -17,6 +17,7 @@ import LeadsList from './pages/LeadsList.jsx';
 import StudentsList from './pages/StudentsList.jsx';
 import Statistics from './pages/Statistics.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
+import MusicList from './pages/MusicList.jsx';
 import './admin.css';
 
 /*
@@ -76,6 +77,7 @@ export default function AdminApp() {
               <Route path="news-categories" element={<CategoriesList kind="news" />} />
               <Route path="news/new" element={<NewsEdit />} />
               <Route path="news/:id" element={<NewsEdit />} />
+              <Route path="music" element={<MusicList />} />
               <Route path="profile" element={<Profile />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Route>
