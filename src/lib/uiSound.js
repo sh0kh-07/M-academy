@@ -1,11 +1,16 @@
 /*
-  Interface sounds, synthesised with the Web Audio API (no audio files).
-  Every kind of element has its own voice, all tuned to one pentatonic scale
-  so they never clash with each other or with the background music:
+  Interface sounds (Web Audio API).
+
+  Pressing anything clickable plays the site's click — public/sfx/click.wav, a short
+  "chik-tak" chosen by the client. It plays dry and at its own volume, and is
+  fetched once, on the visitor's first click or key press.
+
+  Hovering is synthesised: every kind of element has its own voice, all tuned to
+  one pentatonic scale so they never clash with each other or with the music:
 
     menu links       glass notes that rise from left to right, like a little xylophone
     course cards     crystal chimes, each card its own note
-    gold buttons     a warm two-note swell; pressing one plays a short "yes" arpeggio
+    gold buttons     a warm two-note swell
     outline buttons  a soft wooden knock
     news cards       a paper rustle
     tabs, filters    a crisp mechanical tick (the iPhone picker)
@@ -20,6 +25,8 @@
 
 const HOVER = 'a, button, [role="tab"], select, label, input[type="checkbox"], input[type="radio"], .tilt';
 const MIN_GAP_MS = 40; // never more than ~25 sounds a second
+const CLICK_URL = `${import.meta.env.BASE_URL}sfx/click.wav`;
+const CLICK_VOLUME = 0.8;
 
 // E-major pentatonic over two octaves (Hz) — bright, never dissonant
 const SCALE = [659.3, 740, 830.6, 987.8, 1108.7, 1318.5, 1480, 1661.2, 1975.5, 2217.5];
@@ -28,6 +35,9 @@ let ctx = null;
 let master = null;
 let noise = null;
 let lastAt = 0;
+let clickBuffer = null; // the decoded click sample
+let clickOut = null; // its own gain, straight to the speakers (no echo)
+let lastClickAt = 0;
 
 function muted() {
   try {
@@ -35,6 +45,13 @@ function muted() {
   } catch {
     return false;
   }
+}
+
+/** The click file's bytes, fetched once (ahead of time, so the very first press can use it). */
+let clickBytes = null;
+function loadClick() {
+  clickBytes ??= fetch(CLICK_URL).then((res) => (res.ok ? res.arrayBuffer() : Promise.reject(new Error(`HTTP ${res.status}`))));
+  return clickBytes;
 }
 
 /** Create the audio graph; only allowed inside a user gesture. */
@@ -64,6 +81,14 @@ function unlock() {
   master.connect(dry).connect(ctx.destination);
   master.connect(echo).connect(tone).connect(wet).connect(ctx.destination);
   tone.connect(feedback).connect(echo);
+
+  clickOut = ctx.createGain();
+  clickOut.gain.value = CLICK_VOLUME;
+  clickOut.connect(ctx.destination);
+  loadClick()
+    .then((data) => new Promise((resolve, reject) => ctx.decodeAudioData(data, resolve, reject)))
+    .then((buffer) => (clickBuffer = buffer))
+    .catch(() => {}); // until it arrives (or if it can't), a synthesised click stands in
 
   noise = ctx.createBuffer(1, Math.round(ctx.sampleRate * 1.0), ctx.sampleRate);
   const data = noise.getChannelData(0);
@@ -133,10 +158,6 @@ const VOICES = {
     tone(t, { freq: 330, to: 494, type: 'triangle', gain: 0.05, attack: 0.02, decay: 0.22 });
     tone(t + 0.03, { freq: 494, to: 659, gain: 0.03, attack: 0.02, decay: 0.24 });
   },
-  confirm(t) {
-    [0, 2, 5].forEach((step, i) => bell(t + i * 0.06, note(step), { gain: 0.05, decay: 0.4 }));
-    hiss(t, { freq: 2300, q: 1.4, gain: 0.12, decay: 0.03 });
-  },
   wood(t) {
     hiss(t, { freq: 1300, q: 7, gain: 0.22, decay: 0.05 });
     tone(t, { freq: 620, to: 440, gain: 0.05, decay: 0.06 });
@@ -147,9 +168,6 @@ const VOICES = {
   toggle(t) {
     bell(t, note(3), { gain: 0.035, decay: 0.15 });
     bell(t + 0.07, note(5), { gain: 0.035, decay: 0.2 });
-  },
-  harp(t) {
-    [0, 1, 2, 3, 4].forEach((step, i) => bell(t + i * 0.045, note(step + 2), { gain: 0.03, decay: 0.5 }));
   },
   detent(t, { index = 0 } = {}) {
     hiss(t, { freq: 5200, q: 3, gain: 0.1, decay: 0.012 });
@@ -170,24 +188,42 @@ export function cue(kind, opts) {
   VOICES[kind]?.(ctx.currentTime + 0.003, opts);
 }
 
-/* ---------------- which element gets which voice ---------------- */
+/** The press sound: the click sample, or a synthesised click until it has loaded. */
+function click() {
+  if (!ctx || document.hidden || muted()) return;
+  if (ctx.state === 'suspended') ctx.resume(); // the first press both unlocks and plays
+  const now = performance.now();
+  if (now - lastClickAt < 30) return;
+  lastClickAt = now;
+  if (!clickBuffer) {
+    if (ctx.state === 'running') VOICES.press(ctx.currentTime + 0.003);
+    return;
+  }
+  const src = ctx.createBufferSource();
+  src.buffer = clickBuffer;
+  src.playbackRate.value = 1 + (Math.random() - 0.5) * 0.04; // a hair of variation
+  src.connect(clickOut);
+  src.start(ctx.currentTime);
+}
+
+/* ---------------- which element gets which voice (hover) ---------------- */
 
 const indexIn = (el) => (el.parentElement ? [...el.parentElement.children].indexOf(el) : 0);
 
-function voiceFor(el, pressing) {
-  if (el.closest('.music__btn')) return pressing ? ['harp'] : ['glass', { index: 4 }];
+function voiceFor(el) {
+  if (el.closest('.music__btn')) return ['glass', { index: 4 }];
   if (el.closest('.lang')) return ['toggle'];
-  if (el.closest('.btn--gold')) return [pressing ? 'confirm' : 'warm'];
-  if (el.closest('.btn--ghost, .link-arrow, .link-back')) return [pressing ? 'press' : 'wood'];
+  if (el.closest('.btn--gold')) return ['warm'];
+  if (el.closest('.btn--ghost, .link-arrow, .link-back')) return ['wood'];
   const course = el.closest('.course, .ring__card');
-  if (course) return pressing ? ['press'] : ['chime', { index: indexIn(course) }];
-  if (el.closest('.post')) return [pressing ? 'press' : 'paper'];
+  if (course) return ['chime', { index: indexIn(course) }];
+  if (el.closest('.post')) return ['paper'];
   const link = el.closest('.nav__links a, .menu__links a, .footer__col a');
-  if (link) return pressing ? ['press'] : ['glass', { index: indexIn(link) }];
-  if (el.closest('[role="tab"], .filters button, .choice, .stepper li')) return [pressing ? 'press' : 'tick'];
+  if (link) return ['glass', { index: indexIn(link) }];
+  if (el.closest('[role="tab"], .filters button, .choice, .stepper li')) return ['tick'];
   const card = el.closest('.tilt');
-  if (card && !pressing) return ['chime', { index: indexIn(card) + 2 }];
-  return [pressing ? 'press' : 'tick'];
+  if (card) return ['chime', { index: indexIn(card) + 2 }];
+  return ['tick'];
 }
 
 /** Wire the sounds to the page. Returns a function that removes them. */
@@ -196,16 +232,18 @@ export function startUiSounds() {
   let hovered = null;
 
   const usable = (el) => el && !el.closest('[disabled], [aria-disabled="true"]');
+  // 18 KB: fetch it once the page has settled, so it is ready for the first press
+  const prefetch = setTimeout(() => loadClick().catch(() => {}), 1500);
 
   const onDown = (e) => {
     unlock();
     const target = e.target instanceof Element ? e.target.closest(HOVER) : null;
-    if (usable(target)) cue(...voiceFor(target, true));
+    if (usable(target)) click();
   };
   const onKey = (e) => {
     unlock();
     if ((e.key === 'Enter' || e.key === ' ') && e.target instanceof Element && e.target.closest('a, button')) {
-      cue(...voiceFor(e.target, true));
+      click();
     }
   };
   const onOver = (e) => {
@@ -213,7 +251,7 @@ export function startUiSounds() {
     const target = e.target instanceof Element ? e.target.closest(HOVER) : null;
     if (target === hovered) return;
     hovered = target;
-    if (usable(target)) cue(...voiceFor(target, false));
+    if (usable(target)) cue(...voiceFor(target));
   };
 
   window.addEventListener('pointerdown', onDown, true);
@@ -221,6 +259,7 @@ export function startUiSounds() {
   if (finePointer) document.addEventListener('pointerover', onOver, { passive: true });
 
   return () => {
+    clearTimeout(prefetch);
     window.removeEventListener('pointerdown', onDown, true);
     window.removeEventListener('keydown', onKey, true);
     document.removeEventListener('pointerover', onOver);
