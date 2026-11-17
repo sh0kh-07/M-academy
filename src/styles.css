@@ -3077,6 +3077,44 @@ body.menu-open .music {
   transition: color 0.3s;
 }
 
+.footer__socials a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.footer__social-icon {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--gold);
+  transition:
+    border-color 0.3s,
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.footer__social-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.footer__social-icon img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.footer__socials a:hover .footer__social-icon {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: #1a1204;
+}
+
 .footer__col a:hover,
 .footer__bottom button:hover {
   color: var(--gold-l);

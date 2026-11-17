@@ -1,10 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Routes, useLocation } from 'react-router-dom';
 import { LANGS, useI18n } from '../i18n/index.jsx';
-import { CONFIG } from '../data/courses.js';
+import { useSocials } from '../lib/socials.js';
+import SocialIcon from './SocialIcon.jsx';
 import { reducedMotion } from '../lib/env.js';
 import { lockScroll, scrollToTop, unlockScroll } from '../lib/scroll.js';
-import { postJSON } from '../lib/http.js';
+import { mediaUrl, pick, postJSON } from '../lib/http.js';
 import { usePointerFx, useReveal } from '../hooks/usePageFx.js';
 import Cursor from './Cursor.jsx';
 import MusicPlayer from './MusicPlayer.jsx';
@@ -61,20 +62,9 @@ function LangSwitch() {
 }
 
 function Footer() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const founder = useFounder(); // the link appears once the founder page is filled in
-  const social = (name, label) => {
-    const url = CONFIG[name];
-    return url && url !== '#' ? (
-      <a href={url} target="_blank" rel="noopener">
-        {label}
-      </a>
-    ) : (
-      <a href="#" onClick={(e) => e.preventDefault()}>
-        {label}
-      </a>
-    );
-  };
+  const socials = useSocials(); // from the admin panel; the block hides while there are none
 
   return (
     <footer className="footer">
@@ -92,12 +82,23 @@ function Footer() {
           <Link to="/news">{t('nav.news')}</Link>
           <Link to="/register">{t('cta.signup')}</Link>
         </nav>
-        <nav className="footer__col">
-          <b>{t('footer.social')}</b>
-          {social('telegram', 'Telegram')}
-          {social('instagram', 'Instagram')}
-          {social('youtube', 'YouTube')}
-        </nav>
+        {socials.length > 0 && (
+          <nav className="footer__col footer__socials">
+            <b>{t('footer.social')}</b>
+            {socials.map((s) => {
+              const name = pick(s.name, lang);
+              const external = /^https?:/i.test(s.url);
+              return (
+                <a key={s.id ?? s.url} href={s.url} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
+                  <span className="footer__social-icon">
+                    {s.image ? <img src={mediaUrl(s.image)} alt="" loading="lazy" /> : <SocialIcon name={s.icon} />}
+                  </span>
+                  {name}
+                </a>
+              );
+            })}
+          </nav>
+        )}
       </div>
       <div className="container footer__bottom">
         <span>

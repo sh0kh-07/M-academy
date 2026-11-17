@@ -248,3 +248,17 @@ export const founder = {
   get: (signal) => api('/admin/founder', { signal }),
   save: (body) => api('/admin/founder', { method: 'PUT', body }),
 };
+
+/* ---------------- social links ---------------- */
+
+/**
+ * Footer social links (Swagger "Admin · Ijtimoiy tarmoqlar").
+ * { name: {uz,ru,en}, icon (key) or image (uploaded path), url, sort_order, is_active }
+ */
+export const socials = {
+  list: (signal) => api('/admin/socials', { signal }).then((d) => byOrder(records(d))),
+  get: (id, signal) => api(`/admin/socials/${encodeURIComponent(id)}`, { signal }),
+  create: (body) => api('/admin/socials', { method: 'POST', body }),
+  update: (id, body) => api(`/admin/socials/${encodeURIComponent(id)}`, { method: 'PATCH', body }),
+  remove: (id) => api(`/admin/socials/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+};

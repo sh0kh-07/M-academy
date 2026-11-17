@@ -38,6 +38,7 @@ const NAV = [
     items: [
       { to: '/admin/founder', key: 'nav.founder', icon: 'user' },
       { to: '/admin/music', key: 'nav.music', icon: 'music' },
+      { to: '/admin/socials', key: 'nav.socials', icon: 'link' },
     ],
   },
   {
@@ -62,6 +63,7 @@ const CRUMBS = [
   ['/admin/teachers', 'nav.teachers'],
   ['/admin/music', 'nav.music'],
   ['/admin/founder', 'nav.founder'],
+  ['/admin/socials', 'nav.socials'],
   ['/admin/profile', 'nav.profile'],
 ];
 const crumb = (path) => CRUMBS.find(([prefix]) => path.startsWith(prefix))?.[1] ?? 'nav.dashboard';
